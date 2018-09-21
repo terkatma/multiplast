@@ -1,0 +1,2 @@
+services:
+		invitationsRepository: DB\InvitationsRepository

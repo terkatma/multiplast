@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width">
+	<script src="{$basePath}/js/jquery.min.js"></script>
+	<script src="{$basePath}/bower_components/nette-forms/src/assets/netteForms.js"></script>
+	<script src="{$basePath}/bower_components/nette.ajax.js/nette.ajax.js"></script>
+	<script type='text/javascript' src="{$basePath}/js/jquery-ui.min.js"></script>
+
+
+
+	{*datagrid css*}
+	<link rel="stylesheet" type="text/css" href="{$basePath}/bower_components/happy/dist/happy.css">
+	<link rel="stylesheet" type="text/css"
+		  href="{$basePath}/bower_components/ublaboo-datagrid/assets/dist/datagrid.css">
+	{*end datagrid css*}
+
+	{*datagrid js*}
+	<script src="{$basePath}/bower_components/happy/dist/happy.js"></script>
+	<script src="{$basePath}/bower_components/ublaboo-datagrid/assets/dist/datagrid.js"></script>
+
+	<!-- It is recommended to include this JS file with just a few bits. It refreshes URL on non ajax request -->
+	<script src="{$basePath}/bower_components/ublaboo-datagrid/assets/dist/datagrid-instant-url-refresh.js"></script>
+
+	<!-- Use this little extension for ajax spinners -->
+	<script src="{$basePath}/bower_components/ublaboo-datagrid/assets/dist/datagrid-spinners.js"></script>
+
+	<!-- Include bootstrap.js for proper behaviour of ColumnStatus -->
+	<script src="{$basePath}/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	{*end datagrid js*}
+
+	<script type="text/javascript" src="{$basePath}/js/main.js"></script>
+
+	{*Voda Datepicker*}
+
+
+
+	<link rel="stylesheet" href="{$basePath}/css/jquery-ui.css" type="text/css" media="all"/>
+	<link href="{$basePath}/css/bootstrap.css" media="screen" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css"
+		  media="all"/>
+
+
+	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
+</head>
+
+<body>
+	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
+
+	{include content}
+
+	{block scripts}
+	<script src="https://nette.github.io/resources/js/netteForms.min.js"></script>
+	{/block}
+</body>
+</html>

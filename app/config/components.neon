@@ -1,0 +1,8 @@
+services:
+    signInComponentFactory:
+        implement: App\Components\ISignInComponentFactory
+        inject: yes
+
+    invitationsGridComponentFactory:
+        implement: App\Components\IInvitationsGridComponentFactory
+        inject: yes
