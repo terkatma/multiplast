@@ -26,6 +26,13 @@ final class HomepagePresenter extends BaseSecuredPresenter
     /**
      * @return SignInComponent
      */
+
+    /**
+     * @inject
+     * @var \DB\InvitationsRepository
+     */
+    public $invitationsRepository;
+
     public function createComponentSignIn()
     {
         return $this->signInComponentFactory->create();
@@ -37,5 +44,11 @@ final class HomepagePresenter extends BaseSecuredPresenter
     public function createComponentInvitationsGrid()
     {
         return $this->invitationsGridComponentFactory->create();
+    }
+
+    public function actionDefault()
+    {
+        $this->template->invitationCount = $this->invitationsRepository->findAll()->sum("invitation_count");
+        $this->template->ticketCount = $this->invitationsRepository->findAll()->sum("ticket_count");
     }
 }
