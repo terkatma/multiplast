@@ -24,15 +24,14 @@ final class HomepagePresenter extends BaseSecuredPresenter
     public $invitationsGridComponentFactory;
 
     /**
-     * @return SignInComponent
-     */
-
-    /**
      * @inject
      * @var \DB\InvitationsRepository
      */
     public $invitationsRepository;
 
+    /**
+     * @return SignInComponent
+     */
     public function createComponentSignIn()
     {
         return $this->signInComponentFactory->create();

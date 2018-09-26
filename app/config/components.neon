@@ -6,3 +6,7 @@ services:
     invitationsGridComponentFactory:
         implement: App\Components\IInvitationsGridComponentFactory
         inject: yes
+
+    invitationAnswerComponentFactory:
+        implement: App\Components\IInvitationAnswerComponentFactory
+        inject: yes

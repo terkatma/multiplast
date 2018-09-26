@@ -8,7 +8,7 @@ use Ublaboo\DataGrid\DataGrid;
 
 
 /**
- * Class InvitationsGridComponent
+ * Class InvitationAnswerComponent
  * @package App\Components
  */
 class InvitationsGridComponent extends BaseGridComponent
