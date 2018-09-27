@@ -11,5 +11,5 @@ interface IInvitationAnswerComponentFactory
     /**
      * @return InvitationAnswerComponent
      */
-	public function create();
+	public function create($customerId);
 }

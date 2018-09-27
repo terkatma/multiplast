@@ -26,16 +26,20 @@ final class InvitationAnswerPresenter extends Nette\Application\UI\Presenter
      */
     public $invitationsRepository;
 
+    private $customerId;
+
     /**
      * @return InvitationAnswerComponent
      */
     public function createComponentInvitationAnswer()
     {
-        return $this->invitationAnswerComponentFactory->create();
+        return $this->invitationAnswerComponentFactory->create($this->customerId);
     }
 
-    public function actionDefault()
+    public function actionDefault($id)
     {
+        $this->customerId = $id;
+        $this->template->customer = $this->invitationsRepository->findById($id);
     }
 
 

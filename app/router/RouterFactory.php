@@ -19,9 +19,10 @@ final class RouterFactory
 		$router = new RouteList;
 
 
-        $router[] = new Route('invitation-answer', [
+        $router[] = new Route('invitation-answer[/<id>]', [
             'presenter' => 'InvitationAnswer',
-            'action' => 'default'
+            'action' => 'default',
+            'id' => null
         ]);
 
         $router[] = new Route('<presenter>/<action>[/<id>]', 'Homepage:default');

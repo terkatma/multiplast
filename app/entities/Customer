@@ -1,0 +1,25 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: root
+ * Date: 12.4.17
+ * Time: 19:08
+ */
+
+namespace app\entities;
+
+
+use Nette\Database\Table\ActiveRow;
+
+class Customer extends ActiveRow
+{
+    /* @var int id*/
+    public $id;
+
+    /* @var string name*/
+    public $name;
+
+    /* @var int ticket_count*/
+    public $ticket_count;
+
+}

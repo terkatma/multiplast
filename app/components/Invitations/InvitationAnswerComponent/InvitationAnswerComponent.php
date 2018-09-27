@@ -2,6 +2,7 @@
 
 namespace App\Components;
 
+use app\entities\Customer;
 use DB\InvitationsRepository;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Application\UI\Form;
@@ -19,23 +20,25 @@ class InvitationAnswerComponent extends BaseGridComponent
      * @var \DB\InvitationsRepository
      */
     protected $invitationsRepository;
-
+    private $customerId;
 
     public function __construct(
-        InvitationsRepository $invitationsRepository
+        InvitationsRepository $invitationsRepository, $customerId
     )
     {
         parent::__construct();
 
+        $this->customerId = $customerId;
         $this->invitationsRepository = $invitationsRepository;
     }
 
     /**
-     * @param string $name
-     * @return DataGrid
+     * @return Form
      */
     protected function createComponentInvitationAnswer()
     {
+        /* @var Customer $customer*/
+        $customer = $this->invitationsRepository->findById($this->customerId);
 
         $invitation_count = [
             '2' => 'Zúčastním se (2 vstupenky)',
@@ -45,15 +48,23 @@ class InvitationAnswerComponent extends BaseGridComponent
 
         $form = new Form();
 
-        $form->addSelect('invitation_count', 'Účast a počet vstupenek', $invitation_count)
-            ->setPrompt('Vyberte z nabídky')
-            ->addRule(Form::FILLED, 'Vyberte počet vstupenek.');
+        $form->addSelect('ticket_count', 'Účast a počet vstupenek', $invitation_count)
+            ->setPrompt('Vyberte z nabídky');
 
         $form->addSubmit('send', "Odeslat odpověď") //potvrdit účast?
             ->setAttribute('class', 'btn');
 
-        //$form->onSuccess[] = [$this, "signInSubmitted"];
+        $form->setDefaults($customer);
+
+        $form->onSuccess[] = [$this, "invitationAnswerSubmitted"];
         return $form;
+    }
+
+    public function invitationAnswerSubmitted(Form $form)
+    {
+        $values = $form->getValues();
+        $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count);
+        $this->getPresenter()->flashMessage('Uloženo', 'success');
     }
 
 }
