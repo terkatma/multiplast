@@ -4,8 +4,7 @@ namespace App\Components;
 
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
-Use Nette\Mail\SmtpMailer;
-Use Nette\Mail;
+use Nette\Utils\Random;
 use app\entities\Customer;
 use Utils\Email\Email;
 
@@ -68,6 +67,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
         $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
         $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
+        //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
 
         return $grid;
     }
@@ -96,5 +96,19 @@ class InvitationsGridComponent extends BaseGridComponent
 
         }
         $this->presenter->flashMessage("Maily úspěšně odeslány", "success");
+    }
+
+    public function generateHash($ids){
+
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+
+        foreach ($customers as $customer) {
+            $hash = Random::generate(6);
+            while ($this->invitationsRepository->checkKeyDuplicity($hash)) {
+                $hash = Random::generate(6);
+            }
+        $this->invitationsRepository->updateCustomersHash($customer->id, $hash);
+        }
+        $this->getPresenter()->flashMessage('Uloženo', 'success' );
     }
 }
