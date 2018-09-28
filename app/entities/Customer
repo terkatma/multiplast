@@ -19,7 +19,12 @@ class Customer extends ActiveRow
     /* @var string name*/
     public $name;
 
+    /* @var string company*/
+    public $company;
+
     /* @var int ticket_count*/
     public $ticket_count;
 
+    /* @var int invitation_count*/
+    public $invitation_count;
 }

@@ -2,9 +2,12 @@
 
 namespace App\Components;
 
-use app\entities\Generate;
-use app\entities\Team;
 use Ublaboo\DataGrid\DataGrid;
+use Nette\Mail\Message;
+Use Nette\Mail\SmtpMailer;
+Use Nette\Mail;
+use app\entities\Customer;
+use Utils\Email\Email;
 
 
 /**
@@ -20,8 +23,14 @@ class InvitationsGridComponent extends BaseGridComponent
      */
     public $invitationsRepository;
 
-    public $ticket_count = [];
     public $all_tickets = [];
+
+    /**
+     * @inject
+     * @var \Utils\Email\Email
+     */
+    public $mailer;
+
 
     public function __construct()
     {
@@ -41,7 +50,9 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid = $this->getGrid($name);
         $grid->setDataSource($this->invitationsRepository->findAll());
 
-        $this->ticket_count = $ticket_count = ['' => 'Všichni', 0 => 'Odmítli', 1 => '1', 2 => '2'];
+        $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
+        $is_sent = $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
+        $is_answered = $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
 
         /**
          * Columns
@@ -52,9 +63,38 @@ class InvitationsGridComponent extends BaseGridComponent
         //$grid->addColumnText( "email2", "E-mail", "email");
         //$grid->addColumnNumber("ticket_count", "Počet lístků");
         $grid->addColumnText('invitation_count', 'Počet pozvaných');
-        $grid->addColumnText('ticket_count', 'Počet potvrzených lístků')->setFilterSelect($this->ticket_count);
+        $grid->addColumnText('ticket_count', 'Počet potvrzených lístků')->setFilterSelect($ticket_count);
         $grid->addColumnText("note", "Poznámka");
+        $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
+        $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
+        $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
 
         return $grid;
+    }
+
+    public function sendMail($ids){
+
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+
+        foreach ($customers as $customer) {
+            /* @var Customer $customer */
+            $mail = new Message;
+            $mail->setSubject("Vánoční večírek 2018");
+            $mail->setFrom('monika.drobna86@gmail.com', 'Lukáš');
+            $template = parent::createTemplate();
+            $template->customer = $customer;
+
+            $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
+
+            $mail->setHtmlBody($template);
+            //$mail->addAttachment("Projekt Cerberus.pdf", file_get_contents(__ROOT_DIR__ . __ATACHDIR__ . "../cerberus/" . $member->year . "/" . $member->turnus . "/" . $member->participant_id . ".pdf"));
+
+            $mail->addTo($customer["email"]);
+
+            $this->mailer->smtpMailer->send($mail);
+            //Debugger::log('Odeslání Cerberus mailu účastníkovi ' . $customer->name . ' ' . $customer->company . '; ID ', "cerberusMails");
+
+        }
+        $this->presenter->flashMessage("Maily úspěšně odeslány", "success");
     }
 }

@@ -50,4 +50,6 @@ final class HomepagePresenter extends BaseSecuredPresenter
         $this->template->invitationCount = $this->invitationsRepository->findAll()->sum("invitation_count");
         $this->template->ticketCount = $this->invitationsRepository->findAll()->sum("ticket_count");
     }
+
+
 }

@@ -43,13 +43,17 @@ class InvitationAnswerComponent extends BaseGridComponent
         $invitation_count = [
             '2' => 'Zúčastním se (2 vstupenky)',
             '1' => 'Zúčastním se (1 vstupenka)',
-            '0' => 'Nezúčastním se (0 vstupenek)',
+            '0' => 'Nezúčastním se',
         ];
 
         $form = new Form();
 
         $form->addSelect('ticket_count', 'Účast a počet vstupenek', $invitation_count)
             ->setPrompt('Vyberte z nabídky');
+
+        $form->addTextArea('note', 'Poznámka', 40, 5);
+           // ->addRule(Form::FILLED, 'Zadejte popis.')
+           // ->addRule(Form::MAX_LENGTH, 'Poznámka je příliš dlouhá', 10000);
 
         $form->addSubmit('send', "Odeslat odpověď") //potvrdit účast?
             ->setAttribute('class', 'btn');
@@ -63,8 +67,8 @@ class InvitationAnswerComponent extends BaseGridComponent
     public function invitationAnswerSubmitted(Form $form)
     {
         $values = $form->getValues();
-        $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count);
-        $this->getPresenter()->flashMessage('Uloženo', 'success');
+        $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count, $values->note);
+        $this->getPresenter()->flashMessage('Uloženo', 'success' );
     }
 
 }

@@ -14,6 +14,8 @@ $configurator->createRobotLoader()
 	->addDirectory(__DIR__)
 	->register();
 
+define('__MAIL_DIR__', __DIR__ . '/templates/');
+
 $configurator->addConfig(__DIR__ . '/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
