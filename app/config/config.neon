@@ -17,6 +17,9 @@ services:
 	email:
 		class: Utils\Email\Email
 
+	export:
+	    class: Utils\PDFExport\PDFExport
+
 includes:
     - repositories.neon
     - components.neon

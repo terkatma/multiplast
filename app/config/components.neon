@@ -7,6 +7,10 @@ services:
         implement: App\Components\IInvitationsGridComponentFactory
         inject: yes
 
+    listImportComponentFactory:
+        implement: App\Components\IListImportComponentFactory
+        inject: yes
+
     invitationAnswerComponentFactory:
         implement: App\Components\IInvitationAnswerComponentFactory
         inject: yes

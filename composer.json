@@ -22,7 +22,8 @@
 		"tracy/tracy": "^2.4",
 		"ublaboo/datagrid": "^5.4",
 		"robmorgan/phinx": "^0.10.6",
-		"ondrs/hi": "^0.3.1"
+		"ondrs/hi": "^0.3.1",
+		"tecnickcom/tcpdf": "^6.2"
 	},
 	"require-dev": {
 		"nette/tester": "^2.0"

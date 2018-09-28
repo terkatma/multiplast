@@ -26,6 +26,11 @@ class InvitationsRepository extends Repository
         $this->findBy(['id' => $id])->update(['hash' => $hash,]);
     }
 
+    public function findDuplicity($name, $company, $email) {
+        return $this
+            ->findBy(["name" => $name, "company" => $company, "email" => $email])
+            ->fetch();
+    }
     public function getIdByHash($hash)
     {
         return $this->findBy(['hash' => $hash])->fetch();
