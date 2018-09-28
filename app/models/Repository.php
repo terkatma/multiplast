@@ -75,6 +75,8 @@ abstract class Repository
 	    }
     }
 
-    
-
+    public function insert($values)
+    {
+        return $this->getTable()->insert($values);
+    }
 }

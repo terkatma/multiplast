@@ -3,10 +3,12 @@
 namespace App\Presenters;
 
 use App\Components\IInvitationsGridComponentFactory;
+use App\Components\IListImportComponentFactory;
 use App\Components\InvitationsGridComponent;
 use App\Components\ISignInComponentFactory;
+use App\Components\ListImportComponent;
 use App\Components\SignInComponent;
-use Nette;
+use app\entities\Customer;
 
 
 final class HomepagePresenter extends BaseSecuredPresenter
@@ -30,6 +32,18 @@ final class HomepagePresenter extends BaseSecuredPresenter
     public $invitationsRepository;
 
     /**
+     * @inject
+     * @var IListImportComponentFactory
+     */
+    public $listImportComponentFactory;
+
+    /**
+     * @inject
+     * @var \Utils\PDFExport\PDFExport
+     */
+    public $pdfExport;
+
+    /**
      * @return SignInComponent
      */
     public function createComponentSignIn()
@@ -51,5 +65,29 @@ final class HomepagePresenter extends BaseSecuredPresenter
         $this->template->ticketCount = $this->invitationsRepository->findAll()->sum("ticket_count");
     }
 
+    public function handleGeneratePdf($ids) {
+        /* @var Customer[] $customers */
+        $customers = $this->invitationsRepository
+            ->findAll()
+            ->where("id", $ids)
+            ->fetchAll();
 
+        if (!is_dir(__INVITATIONS_DIR__."/" . date("Y") . "/")) {
+            mkdir(__INVITATIONS_DIR__."/" . date("Y") . "/", 0777, true);
+        }
+
+        foreach ($customers as $customer) {
+            $this->pdfExport->generateInvitationPdf($customer);
+        }
+    }
+
+
+
+    /**
+     * @return ListImportComponent
+     */
+    public function createComponentListImport()
+    {
+        return $this->listImportComponentFactory->create();
+    }
 }

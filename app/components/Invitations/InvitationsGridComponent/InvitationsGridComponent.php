@@ -2,12 +2,10 @@
 
 namespace App\Components;
 
+use App\Presenters\HomepagePresenter;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
-Use Nette\Mail\SmtpMailer;
-Use Nette\Mail;
 use app\entities\Customer;
-use Utils\Email\Email;
 
 
 /**
@@ -58,6 +56,7 @@ class InvitationsGridComponent extends BaseGridComponent
          * Columns
          */
         $grid->addColumnText("name", "Jméno");
+        $grid->addColumnText("addressing", "Oslovení");
         $grid->addColumnText("company", "Firma");
         $grid->addColumnText("email", "E-mail");
         //$grid->addColumnText( "email2", "E-mail", "email");
@@ -68,6 +67,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
         $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
         $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
+        $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
 
         return $grid;
     }
@@ -96,5 +96,14 @@ class InvitationsGridComponent extends BaseGridComponent
 
         }
         $this->presenter->flashMessage("Maily úspěšně odeslány", "success");
+    }
+
+    public function generatePDFs($ids)
+    {
+        /* @var HomepagePresenter $presenter*/
+        $presenter = $this->presenter;
+        $presenter->handleGeneratePdf($ids);
+        $this->presenter->flashMessage("PDF úspěšně vygenerovány.", "success");
+        $this->presenter->redirect("this");
     }
 }

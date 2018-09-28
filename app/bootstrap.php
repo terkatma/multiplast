@@ -15,6 +15,9 @@ $configurator->createRobotLoader()
 	->register();
 
 define('__MAIL_DIR__', __DIR__ . '/templates/');
+define('__CACHE_DIR__', __DIR__ . '/../temp/cache/');
+define('__INVITATIONS_DIR__', __DIR__ . '/../files/invitations/');
+define('__INVITATION_BACKGROUNDS_DIR__', __DIR__ . '/../files/invitationBackgrounds/');
 
 $configurator->addConfig(__DIR__ . '/config/config.neon');
 $configurator->addConfig(__DIR__ . '/config/config.local.neon');
