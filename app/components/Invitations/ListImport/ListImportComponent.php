@@ -30,7 +30,7 @@ class ListImportComponent extends BaseComponent
     {
         $form = new Form();
 
-        $form->addUpload('csv_file', 'Seznam:')
+        $form->addUpload('csv_file', 'Seznam zákazníků:')
             ->addRule(Form::MIME_TYPE,"Soubor musí být formátu CSV",['text/plain','text/csv','text/tsv'])
             ->setRequired(true);
 
@@ -70,13 +70,18 @@ class ListImportComponent extends BaseComponent
                 $name = str_replace("ml.","",$row[$nameIndex]);
                 $name = trim($name);
                 $addressing = $hi->to($name);
+                $hash = Nette\Utils\Random::generate(6);
+                    while ($this->invitationsRepository->checkKeyDuplicity($hash)) {
+                        $hash = Nette\Utils\Random::generate(6);
+                    }
                 $this->invitationsRepository->insert([
                     "name" => $row[$nameIndex],
                     "company" => $row[$companyIndex],
                     "email" => $row[$emailIndex],
                     "addressing" => $addressing!=null?$addressing->vocativ:$name,
                     "is_woman" => $addressing!=null?!strcmp($addressing->gender,"female"):0,
-                    "hash" => Nette\Utils\Random::generate(5),
+                    "hash" => $hash,
+                    "invitation_count" => 2,
                 ]);
             }
         }

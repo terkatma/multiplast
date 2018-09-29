@@ -7,6 +7,7 @@ use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
 use Nette\Utils\Random;
 use app\entities\Customer;
+use Tracy\Debugger;
 
 
 /**
@@ -77,7 +78,7 @@ class InvitationsGridComponent extends BaseGridComponent
     public function sendMail($ids){
 
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
-
+        Debugger::log('===== ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM =============================; ID ');
         foreach ($customers as $customer) {
             /* @var Customer $customer */
             $mail = new Message;
@@ -91,13 +92,20 @@ class InvitationsGridComponent extends BaseGridComponent
             $mail->setHtmlBody($template);
             //$mail->addAttachment("Projekt Cerberus.pdf", file_get_contents(__ROOT_DIR__ . __ATACHDIR__ . "../cerberus/" . $member->year . "/" . $member->turnus . "/" . $member->participant_id . ".pdf"));
 
-            $mail->addTo($customer["email"]);
+            try {
+                $mail->addTo($customer["email"]);
+                $this->mailer->smtpMailer->send($mail);
+                //$this->presenter->flashMessage("Mail zákazníkovi [$customer->name] [$customer->company] úspěšně odeslán", "success");
+                Debugger::log('OK    Odeslání mailu zákazníkovi ' . $customer->id . ' ' . $customer->email . '; ID ');
+            } catch (\Exception $e) {
+                $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
+                Debugger::log('ERROR Odeslání mailu zákazníkovi ' . $customer->id . ' ' . $customer->email . ' se nezdařilo; ID ');
+            }
 
-            $this->mailer->smtpMailer->send($mail);
-            //Debugger::log('Odeslání Cerberus mailu účastníkovi ' . $customer->name . ' ' . $customer->company . '; ID ', "cerberusMails");
 
         }
-        $this->presenter->flashMessage("Maily úspěšně odeslány", "success");
+        $this->presenter->flashMessage("Dokončeno", 'success');
+        $this->presenter->redirect("this");
     }
 
     public function generateHash($ids){
@@ -112,6 +120,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $this->invitationsRepository->updateCustomersHash($customer->id, $hash);
         }
         $this->getPresenter()->flashMessage('Uloženo', 'success' );
+        $this->presenter->redirect("this");
     }
 
     public function generatePDFs($ids)
