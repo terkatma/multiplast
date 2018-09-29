@@ -9,7 +9,7 @@ use Tracy\Debugger;
 
 abstract class BaseSecuredPresenter extends Nette\Application\UI\Presenter {
 
-    private $key = "marpo";
+    private $key = "multi2018plast";
 
     protected function startup() {
         parent::startup();

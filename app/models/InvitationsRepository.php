@@ -26,6 +26,30 @@ class InvitationsRepository extends Repository
         $this->findBy(['id' => $id])->update(['hash' => $hash,]);
     }
 
+    // update customer status is_sent in database
+    public function updateCustomerIsSent($id, $tmp)
+    {
+        $this->findBy(['id' => $id])->update(['is_sent' => $tmp,]);
+    }
+
+    // update customer status is_answered in database
+    public function updateCustomerIsAnswered($id, $tmp)
+    {
+        $this->findBy(['id' => $id])->update(['is_answered' => $tmp,]);
+    }
+
+    //sum is_sent invitation_count
+    public function sumOfSentInvitations()
+    {
+        $customers = $this->findAll();
+        $tmp = 0;
+        foreach ($customers as $customer) {
+        if($customer->is_sent)
+        $tmp = $tmp + $customer->invitation_count;
+        }
+        return $tmp;
+    }
+
     public function findDuplicity($name, $company, $email) {
         return $this
             ->findBy(["name" => $name, "company" => $company, "email" => $email])

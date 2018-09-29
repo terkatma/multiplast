@@ -2,7 +2,7 @@
 
 	<h1 n:block=title>Zákazníci</h1>
 	{control listImport}
-	<p>Pozvaných: {$invitationCount} Potvrzených: {$ticketCount}</p>
+	<p>Pozvaných celkem: {$invitationCount} <br>Počet odeslaných pozvání: {$isSentCount} <br>Potvrzených: {$ticketCount}</p>
 	{control invitationsGrid}
 
 {/block}

@@ -48,6 +48,7 @@ class ListImportComponent extends BaseComponent
         $companyIndex = 0;
         $nameIndex = 2;
         $emailIndex = 3;
+        $isWomanIndex = 5;
         $values = $form->getValues();
 
         $file = $values['csv_file'];
@@ -79,7 +80,8 @@ class ListImportComponent extends BaseComponent
                     "company" => $row[$companyIndex],
                     "email" => $row[$emailIndex],
                     "addressing" => $addressing!=null?$addressing->vocativ:$name,
-                    "is_woman" => $addressing!=null?!strcmp($addressing->gender,"female"):0,
+                    //"is_woman" => $addressing!=null?!strcmp($addressing->gender,"female"):0,
+                    "is_woman" => $row[$isWomanIndex],
                     "hash" => $hash,
                     "invitation_count" => 2,
                 ]);
