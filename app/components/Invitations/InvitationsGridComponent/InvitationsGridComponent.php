@@ -80,8 +80,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addColumnText("note", "Poznámka");
         $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
         $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
-        $grid->addColumnDateTime("reply_deadline", "Termín odpovědi")
-            ->setFormat('Y-m-d')
+        $grid->addColumnText("reply_deadline", "Termín odpovědi")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerReplyDeadline($id, $value);
             });
@@ -112,7 +111,10 @@ class InvitationsGridComponent extends BaseGridComponent
             $template = parent::createTemplate();
             $template->customer = $customer;
 
-            $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
+            if ($customer->language == 'en')
+                $template->setFile(__MAIL_DIR__ . '/Generate/invitation_en.latte');
+            else
+                $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
 
             $mail->setHtmlBody($template);
 

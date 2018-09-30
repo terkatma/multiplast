@@ -1,12 +1,16 @@
 <p>{if $customer->is_woman}Vážená paní{else}Vážený pane{/if} {$customer->addressing},</p>
 
 <p>dovolte mi, abych Vás i s Vaším ctěným protějškem jménem naší společnosti
-	TITAN-Multiplast s.r.o. pozval na již tradiční předvánoční společenskou akci.</p><br>
+	TITAN-Multiplast s.r.o. pozval dne 8.12.2018 na již tradiční předvánoční
+	společenskou akci v Divadle BEZ ZÁBRADLÍ v Praze.</p><br>
 
 <p>Velice nás potěší, když si v předvánočním čase najdete chvíli na společný
 	a příjemně strávený večer v divadle v centru Prahy. Potvrďte nám prosím
-	svou účast do 19.10.2018 prostřednictvím odkazu
-	<a href="/localhost/multiplast/invitation-answer/{$customer->hash}"]}">/localhost/multiplast/invitation-answer/{$customer->hash}</a>.</p><br>
+	svou účast/neúčast do {$customer->reply_deadline} prostřednictvím odkazu
+	<a href="/localhost/multiplast/invitation-answer/{$customer->hash}"]}">/localhost/multiplast/invitation-answer/{$customer->hash}</a></p><br>
+
+<p>Divadlo Bez zábradlí má omezenou kapacitu. Odpovězte i v případě, že se nemůžete zúčastnit,
+	abychom mohli volná místa nabídnout náhradníkům. Děkujeme.</p><br>
 
 <p>Co vás čeká?<br>
 	- 18:00-19:00	Welcome drink a malé občerstvení ve foayer divadla<br>

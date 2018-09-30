@@ -51,4 +51,7 @@ class Customer extends ActiveRow
 
     /* @var string addressing*/
     public $addressing;
+
+    /* @var string reply_deadline*/
+    public $reply_deadline;
 }

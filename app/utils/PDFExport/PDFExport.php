@@ -2,33 +2,12 @@
 
 namespace Utils\PDFExport;
 
-use app\entities\Cerberus;
+
 use app\entities\Customer;
-use app\entities\Game;
-use app\entities\Harmonogram;
-use app\entities\Infiltrator;
-use app\entities\Mafia;
-use app\entities\Participant;
-use app\entities\Station;
-use app\entities\Team;
-use app\entities\User;
-use DB\CerberusRepository;
-use DB\GameRepository;
-use DB\HarmonogramRepository;
-use DB\InfiltratorRepository;
 use DB\InvitationsRepository;
-use DB\MafiaRepository;
-use DB\ParticipantRepository;
-use DB\StationRepository;
-use DB\TeamRepository;
-use DB\UserRepository;
 use Nette;
 use Nette\Utils\Strings;
 use TCPDF;
-use Utils\Cerberus\CerberusGenerator;
-use Utils\Enums\CerberusEnum;
-use Utils\Enums\GamesEnum;
-
 /**
  * Class for generating PDFs
  *
@@ -50,7 +29,7 @@ class PDFExport
         $pdf->Write(13.5, $text);
 
         $pdf->Ln(190);
-        $pdf->Write(13.5, "                          19. 10. 2018");
+        $pdf->Write(13.5, "                           $customer->reply_deadline");
         $pdf->Output(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf", "F");
     }
 
@@ -70,6 +49,8 @@ class PDFExport
         $pdf->SetAutoPageBreak(true, 10);
 
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+        $pdf->SetFont("DeJaVuSans",'', 11.5, true);
+
         if ($addPage) {
             $pdf->AddPage();
 
@@ -78,8 +59,9 @@ class PDFExport
             }
 
             $pdf->Ln(5);
-
-            $pdf->SetFont("courier", '', 13.5);
+            //$pdf->SetFont('courier','', 13.5);
+            //$pdf->setFontSubsetting(true);
+            //$pdf->addFont(__FONTS_DIR__ . "arial.ttf", 'TrueTypeUnicode', 32);
         }
 
         return $pdf;

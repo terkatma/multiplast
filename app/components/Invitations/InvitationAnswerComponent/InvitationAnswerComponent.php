@@ -48,8 +48,8 @@ class InvitationAnswerComponent extends BaseGridComponent
 
         $form = new Form();
 
-        $form->addSelect('ticket_count', 'Účast a počet vstupenek', $invitation_count)
-            ->setPrompt('Vyberte z nabídky');
+        $form->addRadioList('ticket_count', 'Vyberte', $invitation_count);
+            //->setPrompt('Vyberte z nabídky');
 
         $form->addTextArea('note', 'Poznámka', 40, 5);
            // ->addRule(Form::FILLED, 'Zadejte popis.')
