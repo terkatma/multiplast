@@ -57,17 +57,42 @@ class InvitationsGridComponent extends BaseGridComponent
         /**
          * Columns
          */
-        $grid->addColumnText("name", "Jméno");
-        $grid->addColumnText("addressing", "Oslovení");
-        $grid->addColumnText("company", "Firma");
-        $grid->addColumnText("email", "E-mail");
+        $grid->addColumnText("name", "Jméno")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerName($id, $value);
+            });
+        $grid->addColumnText("addressing", "Oslovení")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerAddressing($id, $value);
+            });
+        $grid->addColumnText("company", "Firma")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerCompany($id, $value);
+            });
+        $grid->addColumnText("email", "E-mail")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerEmail($id, $value);
+            });
         //$grid->addColumnText( "email2", "E-mail", "email");
         //$grid->addColumnNumber("ticket_count", "Počet lístků");
         //$grid->addColumnText('invitation_count', 'Počet pozvaných');
-        $grid->addColumnText('ticket_count', 'Počet potvrzených lístků')->setFilterSelect($ticket_count);
+        $grid->addColumnText('ticket_count', 'Potvrzených')->setFilterSelect($ticket_count);
         $grid->addColumnText("note", "Poznámka");
         $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
         $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
+        $grid->addColumnDateTime("reply_deadline", "Termín odpovědi")
+            ->setFormat('Y-m-d')
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerReplyDeadline($id, $value);
+            });
+        $grid->addColumnText("is_woman", "0-muž, 1-žena")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerIsWoman($id, $value);
+            });
+        $grid->addColumnText("language", "Jazyk")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerLanguage($id, $value);
+            });
         $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
         $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
@@ -90,6 +115,7 @@ class InvitationsGridComponent extends BaseGridComponent
             $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
 
             $mail->setHtmlBody($template);
+
             $mail->addAttachment("Vánoční večírek " . date("Y") . " - pozvánka.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
 
             try {

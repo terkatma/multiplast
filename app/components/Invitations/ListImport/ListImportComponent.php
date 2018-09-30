@@ -49,10 +49,11 @@ class ListImportComponent extends BaseComponent
         $nameIndex = 2;
         $emailIndex = 3;
         $isWomanIndex = 5;
+        $replyDeadlineIndex = 6;
+        $languageIndex = 7;
         $values = $form->getValues();
 
         $file = $values['csv_file'];
-
         $csv = $this->csv_to_array($file);
 
         $duplicityCount = 0;
@@ -84,6 +85,8 @@ class ListImportComponent extends BaseComponent
                     "is_woman" => $row[$isWomanIndex],
                     "hash" => $hash,
                     "invitation_count" => 2,
+                    "reply_deadline" => $row[$replyDeadlineIndex],
+                    "language" => $row[$languageIndex],
                 ]);
             }
         }
