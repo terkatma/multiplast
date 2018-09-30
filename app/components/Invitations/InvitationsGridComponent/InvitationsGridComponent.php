@@ -106,19 +106,27 @@ class InvitationsGridComponent extends BaseGridComponent
         foreach ($customers as $customer) {
             /* @var Customer $customer */
             $mail = new Message;
-            $mail->setSubject("Vánoční večírek 2018");
-            $mail->setFrom('monika.drobna86@gmail.com', 'Lukáš');
-            $template = parent::createTemplate();
-            $template->customer = $customer;
 
-            if ($customer->language == 'en')
+            if ($customer->language == 'en'){
+                $mail->setSubject("Christmas party 2018");
+                $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
+                $template = parent::createTemplate();
+                $template->customer = $customer;
+
                 $template->setFile(__MAIL_DIR__ . '/Generate/invitation_en.latte');
-            else
+                $mail->setHtmlBody($template);
+                $mail->addAttachment("Christmas party " . date("Y") . " - invitation.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+            }
+            else {
+                $mail->setSubject("Vánoční večírek 2018");
+                $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
+                $template = parent::createTemplate();
+                $template->customer = $customer;
+
                 $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
-
-            $mail->setHtmlBody($template);
-
-            $mail->addAttachment("Vánoční večírek " . date("Y") . " - pozvánka.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+                $mail->setHtmlBody($template);
+                $mail->addAttachment("Vánoční večírek " . date("Y") . " - pozvánka.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+            }
 
             try {
                 $mail->addTo($customer["email"]);
