@@ -39,27 +39,35 @@ class InvitationAnswerComponent extends BaseGridComponent
     {
         /* @var Customer $customer*/
         $customer = $this->invitationsRepository->findById($this->customerId);
-
-        $invitation_count = [
-            '2' => 'Zúčastním se (2 vstupenky)',
-            '1' => 'Zúčastním se (1 vstupenka)',
-            '0' => 'Nezúčastním se',
-        ];
-
         $form = new Form();
 
-        $form->addRadioList('ticket_count', 'Vyberte', $invitation_count);
+        if ($customer->language == 'en'){
+            $invitation_count = [
+                '2' => 'Confirm participation (2 tickets)',
+                '1' => 'Confirm participation (1 ticket)',
+                '0' => 'Refuse',
+            ];
+            $form->addRadioList('ticket_count', 'Choose', $invitation_count);
+            $form->addTextArea('note', 'Note', 40, 5);
+            $form->addSubmit('send', "Send")
+                ->setAttribute('class', 'btn');
+        }
+        else {
+            $invitation_count = [
+                '2' => 'Zúčastním se (2 vstupenky)',
+                '1' => 'Zúčastním se (1 vstupenka)',
+                '0' => 'Nezúčastním se',
+            ];
+            $form->addRadioList('ticket_count', 'Vyberte', $invitation_count);
             //->setPrompt('Vyberte z nabídky');
-
-        $form->addTextArea('note', 'Poznámka', 40, 5);
-           // ->addRule(Form::FILLED, 'Zadejte popis.')
-           // ->addRule(Form::MAX_LENGTH, 'Poznámka je příliš dlouhá', 10000);
-
-        $form->addSubmit('send', "Odeslat odpověď") //potvrdit účast?
-            ->setAttribute('class', 'btn');
+            $form->addTextArea('note', 'Poznámka', 40, 5);
+            // ->addRule(Form::FILLED, 'Zadejte popis.')
+            // ->addRule(Form::MAX_LENGTH, 'Poznámka je příliš dlouhá', 10000);
+            $form->addSubmit('send', "Odeslat odpověď")
+                ->setAttribute('class', 'btn');
+        }
 
         $form->setDefaults($customer);
-
         $form->onSuccess[] = [$this, "invitationAnswerSubmitted"];
         return $form;
     }

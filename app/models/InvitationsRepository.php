@@ -114,6 +114,10 @@ class InvitationsRepository extends Repository
     {
         return $this->findBy(['hash' => $hash])->fetch();
     }
+    public function getLanguageById($id)
+    {
+        return $this->findBy(['id' => $id])->fetch();
+    }
 
     //checks hash with database
     public function checkKeyDuplicity($hash)

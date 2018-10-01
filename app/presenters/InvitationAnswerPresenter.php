@@ -45,6 +45,4 @@ final class InvitationAnswerPresenter extends Nette\Application\UI\Presenter
         }
         $this->template->customer = $this->invitationsRepository->getIdByHash($hash);
     }
-
-
 }

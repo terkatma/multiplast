@@ -1,7 +1,19 @@
 {block content}
 
-	<h1 n:block=title>Divadlo 2018 - potvrzení účasti</h1>
-	<p>Jméno: {$customer->name}<br> Firma: {$customer->company}</p>
+	<h1 n:block=title>
+		{if ($customer->language == 'en')}
+			Christmas party 2018 - confirmation of participation
+		{else}
+			Vánoční večírek 2018 - potvrzení účasti
+		{/if}
+	</h1>
+	<p>
+		{if ($customer->language == 'en')}
+			Name: {$customer->name}<br> Company: {$customer->company}
+		{else}
+			Jméno: {$customer->name}<br> Firma: {$customer->company}
+		{/if}
+	</p>
 	{control invitationAnswer}
 
 {/block}
