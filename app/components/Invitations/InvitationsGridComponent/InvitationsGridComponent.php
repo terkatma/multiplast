@@ -102,11 +102,12 @@ class InvitationsGridComponent extends BaseGridComponent
     public function sendMail($ids){
 
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
-        Debugger::log('===== ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM ========================================; ID ');
+        Debugger::log('ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM====================; ID ');
+        $sentInvitationCount = 0;
         foreach ($customers as $customer) {
             /* @var Customer $customer */
             $mail = new Message;
-
+            //Debugger::log('ODESÍLÁNÍ [' . $customer->id . '] [' . $customer->email . '] [' . $customer->name . '] [' . $customer->company . ']; ID ');
             if ($customer->language == 'en'){
                 $mail->setSubject("Christmas party 2018");
                 $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
@@ -127,20 +128,22 @@ class InvitationsGridComponent extends BaseGridComponent
                 $mail->setHtmlBody($template);
                 $mail->addAttachment("Vánoční večírek " . date("Y") . " - pozvánka.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
             }
+            Debugger::log('OK    Připojena příloha [' . $customer->id . '] ' . $customer->email . '; ID ');
 
             try {
                 $mail->addTo($customer["email"]);
                 $this->mailer->smtpMailer->send($mail);
                 $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
                 //$this->presenter->flashMessage("Mail zákazníkovi [$customer->name] [$customer->company] úspěšně odeslán", "success");
-                Debugger::log('OK    Odeslání mailu zákazníkovi ' . $customer->id . ' ' . $customer->email . '; ID ');
+                Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
+                $sentInvitationCount++;
             } catch (\Exception $e) {
                 $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
-                Debugger::log('ERROR Odeslání mailu zákazníkovi ' . $customer->id . ' ' . $customer->email . ' se nezdařilo; ID ');
+                Debugger::log('ERROR Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
             }
 
         }
-        $this->presenter->flashMessage("Dokončeno", 'success');
+        $this->presenter->flashMessage("Dokončeno. Odesláno $sentInvitationCount emailů.", 'success');
         $this->presenter->redirect("this");
     }
 
