@@ -17,3 +17,60 @@ div.flash.error {
     color: #8a1f11;
     border-color: #FBC2C4;
 }
+
+#answerBox {
+    max-width:500px;
+    border:1px solid #666;
+    border-radius: 3px;
+    margin:30px auto;
+    padding:20px;
+    background-color:white;
+}
+
+
+#answerBox .smallTitle {
+    font-size:60%;
+    display: block;
+}
+#answerBox h1 {
+    margin-bottom:20px;
+}
+
+#answerBox form {
+    background-color:#e4f1ff;
+    border-radius:2px;
+    padding: 20px;
+}
+#answerBox form input.btn {
+    background-color:#009ee0;
+    color:white;
+}
+
+#answerBox label {
+    display: block;
+    width:100%;
+    padding:15px 35px;
+    margin:4px 0;
+    border-radius:2px;
+    background-color:white;
+}
+#answerBox label:hover {
+    background-color:#009ee0;
+    color:white;
+}
+
+#answerBox .radio br {
+    display: none;
+}
+#answerBox textarea {
+    width:100%;
+}
+#answerHeader {
+    width:100%;
+}
+#answerHeader img {
+    display: block;
+    width:auto;
+    max-width: 100%;
+    margin:10px auto 0 auto;
+}

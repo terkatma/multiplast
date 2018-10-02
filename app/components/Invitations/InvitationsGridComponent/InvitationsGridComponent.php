@@ -3,6 +3,7 @@
 namespace App\Components;
 
 use App\Presenters\HomepagePresenter;
+use Nette\Mail\SendException;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
 use Nette\Utils\Random;
@@ -110,7 +111,7 @@ class InvitationsGridComponent extends BaseGridComponent
             //Debugger::log('ODESÍLÁNÍ [' . $customer->id . '] [' . $customer->email . '] [' . $customer->name . '] [' . $customer->company . ']; ID ');
             if ($customer->language == 'en'){
                 $mail->setSubject("Christmas party 2018");
-                $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
+                $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
                 $template = parent::createTemplate();
                 $template->customer = $customer;
 
@@ -120,7 +121,7 @@ class InvitationsGridComponent extends BaseGridComponent
             }
             else {
                 $mail->setSubject("Vánoční večírek 2018");
-                $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
+                $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
                 $template = parent::createTemplate();
                 $template->customer = $customer;
 
@@ -132,9 +133,13 @@ class InvitationsGridComponent extends BaseGridComponent
 
             try {
                 $mail->addTo($customer["email"]);
-                $this->mailer->smtpMailer->send($mail);
+                try {
+                    $this->mailer->smtpMailer->send($mail);
+                } catch (SendException $e) {
+                    Debugger::log($e, 'mailexception');
+                }
+
                 $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
-                //$this->presenter->flashMessage("Mail zákazníkovi [$customer->name] [$customer->company] úspěšně odeslán", "success");
                 Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
                 $sentInvitationCount++;
             } catch (\Exception $e) {

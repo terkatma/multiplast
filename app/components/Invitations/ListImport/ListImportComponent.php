@@ -8,6 +8,7 @@ use Nette;
 use Nette\Application\UI\Form;
 use Nette\Caching\Storages\FileStorage;
 use ondrs\Hi\Hi;
+use Tracy\Debugger;
 
 /**
  * Class ListImportComponent
@@ -61,12 +62,14 @@ class ListImportComponent extends BaseComponent
         $hi = new Hi(new FileStorage(__CACHE_DIR__));
         $hi->setType(Hi::TYPE_SURNAME);
 
+        Debugger::log('Nahrávání seznamu...; ID ', 'debug');
         foreach ($csv as $row){
             $row = array_values($row);
             $row[$nameIndex] = str_replace("Ing.", "", $row[$nameIndex]);
             $row[$nameIndex] = trim($row[$nameIndex]);
             $duplicity = $this->invitationsRepository->findDuplicity($row[$nameIndex], $row[$companyIndex], $row[$emailIndex]);
             if ($duplicity) {
+                Debugger::log('Duplicitní řádek:  ' . $row[$nameIndex] . ' ; ' . $row[$companyIndex] . ' ; ' . $row[$emailIndex] . ' ; ID ', 'debug');
                 $duplicityCount++;
             } else {
                 $name = str_replace("ml.","",$row[$nameIndex]);
@@ -90,7 +93,7 @@ class ListImportComponent extends BaseComponent
                 ]);
             }
         }
-
+        Debugger::log('Nahrávání seznamu DOKONČENO; ID ', 'debug');
         $this->presenter->flashMessage("Úspěšně nahráno " . (count($csv) - $duplicityCount) ." 
             řádků. $duplicityCount řádků již v databázi bylo.", "success");
         $this->presenter->redirect("this");

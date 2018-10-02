@@ -45,7 +45,7 @@ class InvitationAnswerComponent extends BaseGridComponent
             $invitation_count = [
                 '2' => 'Confirm participation (2 tickets)',
                 '1' => 'Confirm participation (1 ticket)',
-                '0' => 'Refuse',
+                '0' => 'Sorry, I won\'t be able to attend',
             ];
             $form->addRadioList('ticket_count', 'Choose', $invitation_count);
             $form->addTextArea('note', 'Note', 40, 5);
@@ -77,7 +77,7 @@ class InvitationAnswerComponent extends BaseGridComponent
         $values = $form->getValues();
         $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count, $values->note);
         $this->invitationsRepository->updateCustomerIsAnswered($this->customerId->id, 1);
-        $this->getPresenter()->flashMessage('Uloženo', 'success' );
+        $this->getPresenter()->flashMessage('Uloženo / Save', 'success' );
     }
 
 }

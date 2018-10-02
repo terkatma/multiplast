@@ -1,5 +1,8 @@
 {block content}
-
+<div id="answerHeader">
+	<img src="{$basePath}/images/answer-header.png">
+</div>
+<div id="answerBox">
 	<h1 n:block=title>
 		{if ($customer->language == 'en')}
 			Christmas party 2018 - confirmation of participation
@@ -9,11 +12,11 @@
 	</h1>
 	<p>
 		{if ($customer->language == 'en')}
-			Name: {$customer->name}<br> Company: {$customer->company}
+			<strong>Name: </strong>{$customer->name}<br> <strong>Company: </strong>{$customer->company}
 		{else}
-			Jméno: {$customer->name}<br> Firma: {$customer->company}
+			<strong>Jméno: </strong>{$customer->name}{if ($customer->company != '')}<br> <strong>Firma: </strong>{$customer->company}{/if}
 		{/if}
 	</p>
 	{control invitationAnswer}
-
+</div>
 {/block}

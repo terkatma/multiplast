@@ -24,19 +24,20 @@ class PDFExport
             __INVITATION_BACKGROUNDS_DIR__. date("Y") . "/" . $customer->language . ".png",
             0,
             0,210, 297, 'PNG', '', '', false, 300, '', false, false, 0);
-        $pdf->Ln(19);
+
+        $pdf->Ln(30.7);
 
         if ($customer->language == 'en'){
-            $text = "  ".($customer->is_woman?"Dear Mrs":"Dear Mr")." ".$customer->addressing.",";
+            $text = "               ".($customer->is_woman?"Dear Mrs":"Dear Mr")." ".$customer->addressing.",";
             $pdf->Write(13.5, $text);
-            $pdf->Ln(190);
-            $pdf->Write(13.5, "                          $customer->reply_deadline");
+            $pdf->Ln(204.6);
+            $pdf->Write(13.5, "                                         $customer->reply_deadline");
         }
         else{
-            $text = "  ".($customer->is_woman?"Vážená paní":"Vážený pane")." ".$customer->addressing.",";
+            $text = "               ".($customer->is_woman?"Vážená paní":"Vážený pane")." ".$customer->addressing.",";
             $pdf->Write(13.5, $text);
-            $pdf->Ln(190);
-            $pdf->Write(13.5, "                         $customer->reply_deadline");
+            $pdf->Ln(204.6);
+            $pdf->Write(13.5, "                                        $customer->reply_deadline");
         }
 
         $pdf->Output(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf", "F");
@@ -52,10 +53,10 @@ class PDFExport
         $pdf->setPrintFooter(false);
 
 
-        $pdf->SetMargins(PDF_MARGIN_LEFT, 10, PDF_MARGIN_RIGHT);
+        $pdf->SetMargins(0, 0, 0, 0);
         $pdf->setHeaderMargin(PDF_MARGIN_HEADER);
         $pdf->setFooterMargin(PDF_MARGIN_FOOTER);
-        $pdf->SetAutoPageBreak(true, 10);
+        $pdf->SetAutoPageBreak(false, 0);
 
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
         $pdf->SetFont("DeJaVuSans",'', 11.5, true);
