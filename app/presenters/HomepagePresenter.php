@@ -64,6 +64,8 @@ final class HomepagePresenter extends BaseSecuredPresenter
         $this->template->invitationCount = $this->invitationsRepository->findAll()->sum("invitation_count");
         $this->template->ticketCount = $this->invitationsRepository->findAll()->sum("ticket_count");
         $this->template->isSentCount = $this->invitationsRepository->sumOfSentInvitations();
+        $this->template->invitationSentEmailCount = $this->invitationsRepository->findAll()->sum("is_sent");
+        $this->template->isAnsweredCount = $this->invitationsRepository->findAll()->sum("is_answered");
     }
 
     public function handleGeneratePdf($ids) {
@@ -82,13 +84,21 @@ final class HomepagePresenter extends BaseSecuredPresenter
         }
     }
 
-
-
     /**
      * @return ListImportComponent
      */
     public function createComponentListImport()
     {
         return $this->listImportComponentFactory->create();
+    }
+
+    public function handleCreateCustomer($values)
+    {
+        $this->invitationsRepository->createCustomer($values);
+        if (!$this->presenter->isAjax()) {
+            $this->presenter->redirect('this');
+        } else {
+            $this->redrawControl();
+        }
     }
 }

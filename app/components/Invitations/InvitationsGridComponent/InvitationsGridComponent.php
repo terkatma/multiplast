@@ -9,10 +9,11 @@ use Nette\Mail\Message;
 use Nette\Utils\Random;
 use app\entities\Customer;
 use Tracy\Debugger;
-
+use Nette\Forms\Container;
 
 /**
  * Class InvitationAnswerComponent
+ * @property array|mixed onClick
  * @package App\Components
  */
 class InvitationsGridComponent extends BaseGridComponent
@@ -41,6 +42,7 @@ class InvitationsGridComponent extends BaseGridComponent
     /**
      * @param string $name
      * @return DataGrid
+     * @throws \Ublaboo\DataGrid\Exception\DataGridException
      */
     public function createComponentInvitationsGrid($name)
     {
@@ -50,52 +52,127 @@ class InvitationsGridComponent extends BaseGridComponent
          */
         $grid = $this->getGrid($name);
         $grid->setDataSource($this->invitationsRepository->findAll());
+        $grid->setColumnsHideable();
 
         $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
         $is_sent = $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
         $is_answered = $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
 
+        $p = $this->getPresenter();
         /**
          * Columns
          */
+        $grid->addColumnNumber("id", "Id");
+
         $grid->addColumnText("name", "Jméno")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerName($id, $value);
             });
+
         $grid->addColumnText("addressing", "Oslovení")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerAddressing($id, $value);
-            });
+            })
+            ->setSortable();
+
         $grid->addColumnText("company", "Firma")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerCompany($id, $value);
-            });
+            })
+            ->setSortable();
+
         $grid->addColumnText("email", "E-mail")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerEmail($id, $value);
             });
+
         //$grid->addColumnText( "email2", "E-mail", "email");
         //$grid->addColumnNumber("ticket_count", "Počet lístků");
-        //$grid->addColumnText('invitation_count', 'Počet pozvaných');
-        $grid->addColumnText('ticket_count', 'Potvrzených')->setFilterSelect($ticket_count);
+
+        $grid->addColumnNumber('invitation_count', 'Pozvaných')
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerInvitationCount($id, $value);
+            });
+
+        $grid->addColumnNumber('ticket_count', 'Potvrzených')
+            ->setFilterSelect($ticket_count);
+
         $grid->addColumnText("note", "Poznámka");
-        $grid->addColumnText("is_sent", "Odesláno")->setReplacement($is_sent)->setFilterSelect($is_sent);
-        $grid->addColumnText("is_answered", "Odpověď")->setReplacement($is_answered)->setFilterSelect($is_answered);
+
+        $grid->addColumnNumber("is_sent", "Odesláno")
+            ->setReplacement($is_sent)
+            ->setFilterSelect($is_sent);
+
+        $grid->addColumnNumber("is_answered", "Odpověď")
+            ->setReplacement($is_answered)
+            ->setFilterSelect($is_answered);
+
         $grid->addColumnText("reply_deadline", "Termín odpovědi")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerReplyDeadline($id, $value);
             });
+
         $grid->addColumnText("is_woman", "0-muž, 1-žena")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerIsWoman($id, $value);
             });
+
         $grid->addColumnText("language", "Jazyk")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerLanguage($id, $value);
             });
+
+        $grid->addColumnText("hash", "Adresa");
+
         $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
+
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
+
         $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
+
+        /*
+        $grid->addInlineAdd()
+            ->onControlAdd[] = function(Container $container){
+            $container->addText('id')->setAttribute('readonly');
+            $container->addText('name');
+            $container->addText('addressing');
+            $container->addText('company');
+            $container->addText('email');
+            $container->addText('invitation_count');
+            $container->addText('reply_deadline');
+            $container->addText('is_woman');
+            $container->addText('language');
+            $container->addText('hash');
+        };
+
+        $grid->getInlineAdd()->setPositionTop('FALSE');
+
+        $grid->getInlineAdd()->onSubmit[] = function ($values) use ($p) {
+            if ($values["id"] && $values["name"] && $values["adressing"] && $values["company"] && $values["email"]
+                && $values["invitation_count"] && $values["reply_deadline"] && $values["is_woman"] && $values["language"]
+                && $values["hash"]){
+                $p->handleCreateCustomer($values);
+                $p->flashMessage("Hra vytvořena.", 'success');
+                $p->redrawControl("flashMessages");
+            } else {
+                $p->flashMessage("Vyplň údaje.", 'error');
+                $p->redrawControl("flashMessages");
+            }
+        };
+        */
+
+        $grid->addActionCallback('delete', '')
+            ->setIcon('trash')
+            ->setTitle('Smazat')
+            ->setClass('btn btn-xs btn-danger ajax')
+            ->setConfirm('Opravdu chcete smazat zákazníka %s?', 'name')
+            ->onClick[] = function ($id) {
+            $this->invitationsRepository->deleteCustomer($id);
+            $this->presenter->flashMessage("Zákazník [$id] smazán.",'success');
+            $this->presenter->redirect("this");
+        };
+
+        $grid->setColumnsSummary(['invitation_count','ticket_count', 'is_sent','is_answered']);
 
         return $grid;
     }
@@ -105,6 +182,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
         Debugger::log('ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM====================; ID ');
         $sentInvitationCount = 0;
+
         foreach ($customers as $customer) {
             /* @var Customer $customer */
             $mail = new Message;

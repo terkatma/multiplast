@@ -75,10 +75,7 @@ class ListImportComponent extends BaseComponent
                 $name = str_replace("ml.","",$row[$nameIndex]);
                 $name = trim($name);
                 $addressing = $hi->to($name);
-                $hash = Nette\Utils\Random::generate(6);
-                    while ($this->invitationsRepository->checkKeyDuplicity($hash)) {
-                        $hash = Nette\Utils\Random::generate(6);
-                    }
+                $hash = $this->invitationsRepository->generateHash();
                 $this->invitationsRepository->insert([
                     "name" => $row[$nameIndex],
                     "company" => $row[$companyIndex],

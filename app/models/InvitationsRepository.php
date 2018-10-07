@@ -8,6 +8,7 @@
 
 namespace DB;
 
+use Nette;
 
 class InvitationsRepository extends Repository
 {
@@ -92,6 +93,26 @@ class InvitationsRepository extends Repository
         $this->findBy(['id' => $id])->update(['reply_deadline' => $date,]);
     }
 
+    // delete customer in database
+    public function deleteCustomer($id){
+
+        return $this->findBy(['id' => $id])->delete();
+    }
+
+    // add invitation to database
+    public function createCustomer($values)
+    {
+        return $this->getTable()->insert($values);
+
+    }
+
+    public function generateHash(){
+        $hash = Nette\Utils\Random::generate(6);
+        while ($this->checkKeyDuplicity($hash)) {
+            $hash = Nette\Utils\Random::generate(6);
+        }
+        return $hash;
+    }
 
     //sum is_sent invitation_count
     public function sumOfSentInvitations()
@@ -99,21 +120,24 @@ class InvitationsRepository extends Repository
         $customers = $this->findAll();
         $tmp = 0;
         foreach ($customers as $customer) {
-        if($customer->is_sent)
-        $tmp = $tmp + $customer->invitation_count;
+            if ($customer->is_sent)
+                $tmp = $tmp + $customer->invitation_count;
         }
         return $tmp;
     }
 
-    public function findDuplicity($name, $company, $email) {
+    public function findDuplicity($name, $company, $email)
+    {
         return $this
             ->findBy(["name" => $name, "company" => $company, "email" => $email])
             ->fetch();
     }
+
     public function getIdByHash($hash)
     {
         return $this->findBy(['hash' => $hash])->fetch();
     }
+
     public function getLanguageById($id)
     {
         return $this->findBy(['id' => $id])->fetch();
