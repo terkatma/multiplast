@@ -31,7 +31,8 @@ class PDFExport
             $text = "               ".($customer->is_woman?"Dear Mrs":"Dear Mr")." ".$customer->addressing.",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
-            $pdf->Write(13.5, "                                         $customer->reply_deadline");
+            $date = $customer->reply_deadline->format('d.m.Y');
+            $pdf->Write(13.5, "                                         $date");
         }
         else{
             $text = "               ".($customer->is_woman?"Vážená paní":"Vážený pane")." ".$customer->addressing.",";

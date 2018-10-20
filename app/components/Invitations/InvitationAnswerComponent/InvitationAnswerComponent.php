@@ -40,17 +40,15 @@ class InvitationAnswerComponent extends BaseGridComponent
         /* @var Customer $customer*/
         $customer = $this->invitationsRepository->findById($this->customerId);
         $form = new Form();
-
         if ($customer->language == 'en'){
             $invitation_count = [
                 '2' => 'Confirm participation (2 tickets)',
                 '1' => 'Confirm participation (1 ticket)',
                 '0' => 'Sorry, I won\'t be able to attend',
             ];
-            $form->addRadioList('ticket_count', 'Choose', $invitation_count);
-            $form->addTextArea('note', 'Note', 40, 5);
-            $form->addSubmit('send', "Send")
-                ->setAttribute('class', 'btn');
+            $label_choose = 'Choose';
+            $label_note = 'Note';
+            $label_send = 'Send';
         }
         else {
             $invitation_count = [
@@ -58,15 +56,14 @@ class InvitationAnswerComponent extends BaseGridComponent
                 '1' => 'Zúčastním se (1 vstupenka)',
                 '0' => 'Nezúčastním se',
             ];
-            $form->addRadioList('ticket_count', 'Vyberte', $invitation_count);
-            //->setPrompt('Vyberte z nabídky');
-            $form->addTextArea('note', 'Poznámka', 40, 5);
-            // ->addRule(Form::FILLED, 'Zadejte popis.')
-            // ->addRule(Form::MAX_LENGTH, 'Poznámka je příliš dlouhá', 10000);
-            $form->addSubmit('send', "Odeslat odpověď")
-                ->setAttribute('class', 'btn');
+            $label_choose = 'Vyberte';
+            $label_note = 'Poznámka';
+            $label_send = 'Odeslat odpověď';
         }
-
+        $form->addRadioList('ticket_count', $label_choose, $invitation_count);
+        $form->addTextArea('note', $label_note, 40, 5);
+        $form->addSubmit('send', $label_send)
+            ->setAttribute('class', 'btn');
         $form->setDefaults($customer);
         $form->onSuccess[] = [$this, "invitationAnswerSubmitted"];
         return $form;
@@ -77,7 +74,9 @@ class InvitationAnswerComponent extends BaseGridComponent
         $values = $form->getValues();
         $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count, $values->note);
         $this->invitationsRepository->updateCustomerIsAnswered($this->customerId->id, 1);
-        $this->getPresenter()->flashMessage('Uloženo / Save', 'success' );
+
+        $this->customerId->language == 'en'?$message = 'Save':$message = 'Uloženo';
+        $this->getPresenter()->flashMessage($message, 'success');
     }
 
 }

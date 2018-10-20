@@ -9,6 +9,8 @@
 namespace DB;
 
 use Nette;
+use Nette\Forms\Form;
+use Nette\Utils\DateTime;
 
 class InvitationsRepository extends Repository
 {
@@ -50,7 +52,6 @@ class InvitationsRepository extends Repository
     {
         $this->findBy(['id' => $id])->update(['email' => $email,]);
     }
-
     // update customer ticket_count in database
     public function updateCustomerTicketCount($id, $ticket_count)
     {
@@ -90,7 +91,13 @@ class InvitationsRepository extends Repository
     // update customer reply deadline in database
     public function updateCustomerReplyDeadline($id, $date)
     {
-        $this->findBy(['id' => $id])->update(['reply_deadline' => $date,]);
+        $this->findBy(['id' => $id])->update(['reply_deadline' => DateTime::createFromFormat('d.m.Y', $date)]);
+    }
+
+    // update customer user note in database
+    public function updateCustomerUserNote($id, $user_note)
+    {
+        $this->findBy(['id' => $id])->update(['user_note' => $user_note,]);
     }
 
     // delete customer in database
@@ -102,6 +109,7 @@ class InvitationsRepository extends Repository
     // add invitation to database
     public function createCustomer($values)
     {
+        $values->hash = $this->generateHash();
         return $this->getTable()->insert($values);
 
     }

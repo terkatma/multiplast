@@ -3,7 +3,9 @@
 namespace App\Components;
 
 use App\Presenters\HomepagePresenter;
+use Nette\Forms\Form;
 use Nette\Mail\SendException;
+use Nette\Utils\Validators;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
 use Nette\Utils\Random;
@@ -32,7 +34,8 @@ class InvitationsGridComponent extends BaseGridComponent
      * @var \Utils\Email\Email
      */
     public $mailer;
-
+    private $sex;
+    private $language;
 
     public function __construct()
     {
@@ -46,7 +49,6 @@ class InvitationsGridComponent extends BaseGridComponent
      */
     public function createComponentInvitationsGrid($name)
     {
-
         /**
          * @var DataGrid $grid
          */
@@ -55,14 +57,20 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->setColumnsHideable();
 
         $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
-        $is_sent = $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
-        $is_answered = $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
+        $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
+        $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
+        $this->sex = [0 => 'Muž', 1 => 'Žena'];
+        $this->language = ['cz' => 'cz', 'en' => 'en'];
 
+        /**
+         * @var HomepagePresenter $p
+         */
         $p = $this->getPresenter();
         /**
          * Columns
          */
-        $grid->addColumnNumber("id", "Id");
+        $grid->addColumnNumber("id", "Id")
+            ->setDefaultHide();
 
         $grid->addColumnText("name", "Jméno")
             ->setEditableCallback(function($id, $value) {
@@ -83,11 +91,12 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addColumnText("email", "E-mail")
             ->setEditableCallback(function($id, $value) {
-                $this->invitationsRepository->updateCustomerEmail($id, $value);
+                if(Validators::isEmail($value))
+                    $this->invitationsRepository->updateCustomerEmail($id, $value);
+                else
+                    $this->presenter->flashMessage("Zadán neplatný email.", 'error');
+                    $this->presenter->redirect("this");
             });
-
-        //$grid->addColumnText( "email2", "E-mail", "email");
-        //$grid->addColumnNumber("ticket_count", "Počet lístků");
 
         $grid->addColumnNumber('invitation_count', 'Pozvaných')
             ->setEditableCallback(function($id, $value) {
@@ -97,7 +106,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addColumnNumber('ticket_count', 'Potvrzených')
             ->setFilterSelect($ticket_count);
 
-        $grid->addColumnText("note", "Poznámka");
+        $grid->addColumnText("note", "Poznámka zákazníka");
 
         $grid->addColumnNumber("is_sent", "Odesláno")
             ->setReplacement($is_sent)
@@ -107,59 +116,79 @@ class InvitationsGridComponent extends BaseGridComponent
             ->setReplacement($is_answered)
             ->setFilterSelect($is_answered);
 
-        $grid->addColumnText("reply_deadline", "Termín odpovědi")
+        $grid->addColumnDateTime("reply_deadline", "Termín odpovědi")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerReplyDeadline($id, $value);
-            });
+            })
+            ->setFormat('d.m.Y');
 
-        $grid->addColumnText("is_woman", "0-muž, 1-žena")
+        $grid->addColumnText("is_woman","Pohlaví")
+            ->setEditableInputTypeSelect($this->sex)
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerIsWoman($id, $value);
-            });
+            })
+            ->setReplacement($this->sex);
 
         $grid->addColumnText("language", "Jazyk")
+            ->setEditableInputTypeSelect($this->language)
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerLanguage($id, $value);
             });
 
-        $grid->addColumnText("hash", "Adresa");
-
+        $grid->addColumnText("hash", "url")
+            ->setDefaultHide();
+/*
+        $grid->addColumnText("user_note", "Poznámka")
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->updateCustomerUserNote($id, $value);
+            });
+*/
+        /*
+         * Group Action
+         */
         $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
-
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
-
         $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
 
         /*
+         * Inline Add
+         */
         $grid->addInlineAdd()
             ->onControlAdd[] = function(Container $container){
-            $container->addText('id')->setAttribute('readonly');
             $container->addText('name');
             $container->addText('addressing');
             $container->addText('company');
-            $container->addText('email');
-            $container->addText('invitation_count');
-            $container->addText('reply_deadline');
-            $container->addText('is_woman');
-            $container->addText('language');
-            $container->addText('hash');
+
+            $container->addText('email')
+                ->setRequired('Zadejte email')
+                //->setEmptyValue('@')
+                ->addRule(Form::MAX_LENGTH, 'Maximální délka emailu je %d znaků', 30)
+                ->addRule(Form::EMAIL, 'Zadán neplatný email.');
+
+            $container->addInteger('invitation_count');
+
+            $container->addText('reply_deadline', '')
+                ->setType('date');
+
+            $container->addSelect('is_woman', '', $this->sex);
+            $container->addSelect('language', '', $this->language);
+            $container->addText('user_note');
         };
 
         $grid->getInlineAdd()->setPositionTop('FALSE');
 
         $grid->getInlineAdd()->onSubmit[] = function ($values) use ($p) {
-            if ($values["id"] && $values["name"] && $values["adressing"] && $values["company"] && $values["email"]
-                && $values["invitation_count"] && $values["reply_deadline"] && $values["is_woman"] && $values["language"]
-                && $values["hash"]){
+            if ($values["name"] && $values["addressing"] && $values["company"] && $values["email"]
+                && $values["invitation_count"] && $values["reply_deadline"]  && $values["language"]){
                 $p->handleCreateCustomer($values);
-                $p->flashMessage("Hra vytvořena.", 'success');
-                $p->redrawControl("flashMessages");
+                $p->flashMessage("Zákazník " . $values["name"] . " " . $values["company"] . " " .  $values["email"] . " přidán.", 'success');
+                $p->redirect("this");
             } else {
-                $p->flashMessage("Vyplň údaje.", 'error');
-                $p->redrawControl("flashMessages");
+                $p->flashMessage("Chyba. Vyplňte všechna pole.", 'error');
+                $p->redirect("this");
             }
         };
-        */
+
 
         $grid->addActionCallback('delete', '')
             ->setIcon('trash')
@@ -182,31 +211,28 @@ class InvitationsGridComponent extends BaseGridComponent
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
         Debugger::log('ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM====================; ID ');
         $sentInvitationCount = 0;
+        $date = date("Y");
 
         foreach ($customers as $customer) {
             /* @var Customer $customer */
             $mail = new Message;
+            $template = parent::createTemplate();
+            $template->customer = $customer;
             //Debugger::log('ODESÍLÁNÍ [' . $customer->id . '] [' . $customer->email . '] [' . $customer->name . '] [' . $customer->company . ']; ID ');
             if ($customer->language == 'en'){
-                $mail->setSubject("Christmas party 2018");
-                $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
-                $template = parent::createTemplate();
-                $template->customer = $customer;
-
-                $template->setFile(__MAIL_DIR__ . '/Generate/invitation_en.latte');
-                $mail->setHtmlBody($template);
-                $mail->addAttachment("Christmas party " . date("Y") . " - invitation.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+                $subject = "Christmas party $date";
+                $attachement = 'invitation';
             }
             else {
-                $mail->setSubject("Vánoční večírek 2018");
-                $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
-                $template = parent::createTemplate();
-                $template->customer = $customer;
-
-                $template->setFile(__MAIL_DIR__ . '/Generate/invitation.latte');
-                $mail->setHtmlBody($template);
-                $mail->addAttachment("Vánoční večírek " . date("Y") . " - pozvánka.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+                $subject = "Vánoční večírek $date";
+                $attachement = 'pozvánka';
             }
+            $mail->setSubject($subject);
+            $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
+            $mail->addAttachment("$subject - $attachement.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+            $template->setFile(__MAIL_DIR__ . '/Generate/invitation_' . $customer->language . '.latte');
+            $mail->setHtmlBody($template);
+
             Debugger::log('OK    Připojena příloha [' . $customer->id . '] ' . $customer->email . '; ID ');
 
             try {
