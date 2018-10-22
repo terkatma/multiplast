@@ -54,4 +54,7 @@ class Customer extends ActiveRow
 
     /* @var \DateTime reply_deadline*/
     public $reply_deadline;
+
+    /* @var string user_note*/
+    public $user_note;
 }

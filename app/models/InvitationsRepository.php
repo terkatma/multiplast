@@ -8,12 +8,35 @@
 
 namespace DB;
 
+use app\entities\Customer;
 use Nette;
-use Nette\Forms\Form;
 use Nette\Utils\DateTime;
 
 class InvitationsRepository extends Repository
 {
+
+    /* @var Customer $values */
+    /*
+    public function updateCustomerValues($values){
+        return $this->findBy(['id' => $values->id])->update([
+            'ticket_count' => $values->ticket_count,
+            'note' => $values->note,
+            'hash' => $values->hash,
+            'name' => $values->name,
+            'addressing' => $values->addressing,
+            'company' => $values->company,
+            'email' => $values->email,
+            'invitation_count' => $values->invitation_count,
+            'is_sent' => $values->is_sent,
+            'is_answered' => $values->is_answered,
+            'is_woman' => $values->is_woman,
+            'language' => $values->language,
+            'user_note' => $values->user_note,
+            'reply_deadline' => DateTime::createFromFormat('d.m.Y', $values->reply_deadline),
+        ]);
+    }
+    */
+
     // update customer ticket_count and note in database
     public function updateCustomer($id, $ticket_count, $note)
     {

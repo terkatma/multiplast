@@ -55,6 +55,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid = $this->getGrid($name);
         $grid->setDataSource($this->invitationsRepository->findAll());
         $grid->setColumnsHideable();
+        $grid->setPagination(FALSE);
 
         $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
         $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
@@ -144,10 +145,20 @@ class InvitationsGridComponent extends BaseGridComponent
             });
 */
         /*
-         * Group Action
+         * Group Actions
          */
-        $grid->addGroupAction('odeslat')->onSelect[] = [$this, 'sendMail'];
+        $grid->addGroupAction('odeslat pozvánku')->onSelect[] = (function ($ids){
+            $this->sendMail($ids, $emailTemplate = 'invitation');
+        });
+
+        $grid->addGroupAction('odeslat upomínku')->onSelect[] = (function ($ids){
+            $this->sendMail($ids, $emailTemplate = 'reminder');
+        });
+
+        $grid->addGroupAction('odeslat potvrzení účasti')->onSelect[] = [$this, 'sendConfirmationMail'];
+
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
+
         $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
 
         /*
@@ -206,10 +217,14 @@ class InvitationsGridComponent extends BaseGridComponent
         return $grid;
     }
 
-    public function sendMail($ids){
+    public function sendMail($ids, $emailTemplate){
 
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
-        Debugger::log('ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM====================; ID ');
+        if ($emailTemplate == 'invitation')
+            Debugger::log('ODESLÁNÍ POZVÁNEK ZÁKAZNÍKŮM====================; ID ');
+        else if ($emailTemplate == 'reminder')
+            Debugger::log('ODESLÁNÍ UPOMÍNEK ZÁKAZNÍKŮM====================; ID ');
+
         $sentInvitationCount = 0;
         $date = date("Y");
 
@@ -230,7 +245,7 @@ class InvitationsGridComponent extends BaseGridComponent
             $mail->setSubject($subject);
             $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
             $mail->addAttachment("$subject - $attachement.pdf", file_get_contents(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
-            $template->setFile(__MAIL_DIR__ . '/Generate/invitation_' . $customer->language . '.latte');
+            $template->setFile(__MAIL_DIR__ . '/Generate/' . $emailTemplate . '_' . $customer->language . '.latte');
             $mail->setHtmlBody($template);
 
             Debugger::log('OK    Připojena příloha [' . $customer->id . '] ' . $customer->email . '; ID ');
@@ -253,6 +268,51 @@ class InvitationsGridComponent extends BaseGridComponent
 
         }
         $this->presenter->flashMessage("Dokončeno. Odesláno $sentInvitationCount emailů.", 'success');
+        $this->presenter->redirect("this");
+    }
+
+    public function sendConfirmationMail($ids){
+
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+            Debugger::log('ODESLÁNÍ POTVRZENÍ ÚČASTI====================; ID ');
+
+        $sentInvitationCount = 0;
+        $date = date("Y");
+
+        foreach ($customers as $customer) {
+            /* @var Customer $customer */
+            $mail = new Message;
+            $template = parent::createTemplate();
+            $template->customer = $customer;
+            //Debugger::log('ODESÍLÁNÍ [' . $customer->id . '] [' . $customer->email . '] [' . $customer->name . '] [' . $customer->company . ']; ID ');
+            if ($customer->language == 'en'){
+                $subject = "Christmas party $date - confirmation of participation";
+            }
+            else {
+                $subject = "Vánoční večírek $date - potvrzení účasti";
+            }
+            $mail->setSubject($subject);
+            $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
+            $template->setFile(__MAIL_DIR__ . '/Generate/confirmation_' . $customer->language . '.latte');
+            $mail->setHtmlBody($template);
+
+            try {
+                $mail->addTo($customer["email"]);
+                try {
+                    $this->mailer->smtpMailer->send($mail);
+                } catch (SendException $e) {
+                    Debugger::log($e, 'mailexception');
+                }
+
+                $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
+                Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
+                $sentInvitationCount++;
+            } catch (\Exception $e) {
+                $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
+                Debugger::log('ERROR Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
+            }
+        }
+        $this->presenter->flashMessage("Dokončeno. Odesláno $sentInvitationCount emailů o potvrzení účasti.", 'success');
         $this->presenter->redirect("this");
     }
 

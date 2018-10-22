@@ -27,18 +27,18 @@ class PDFExport
 
         $pdf->Ln(30.7);
 
+        $date = $customer->reply_deadline->format('d.m.Y');
         if ($customer->language == 'en'){
             $text = "               ".($customer->is_woman?"Dear Mrs":"Dear Mr")." ".$customer->addressing.",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
-            $date = $customer->reply_deadline->format('d.m.Y');
             $pdf->Write(13.5, "                                         $date");
         }
         else{
             $text = "               ".($customer->is_woman?"Vážená paní":"Vážený pane")." ".$customer->addressing.",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
-            $pdf->Write(13.5, "                                        $customer->reply_deadline");
+            $pdf->Write(13.5, "                                        $date");
         }
 
         $pdf->Output(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf", "F");
