@@ -57,4 +57,16 @@ class Customer extends ActiveRow
 
     /* @var string user_note*/
     public $user_note;
+
+    /* @var \DateTime invitation_sent_log*/
+    public $invitation_sent_log;
+
+    /* @var \DateTime answer_log*/
+    public $answer_log;
+
+    /* @var \DateTime reminder_sent_log*/
+    public $reminder_sent_log;
+
+    /* @var \DateTime confirmation_sent_log*/
+    public $confirmation_sent_log;
 }

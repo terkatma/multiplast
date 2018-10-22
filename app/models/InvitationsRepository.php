@@ -11,6 +11,7 @@ namespace DB;
 use app\entities\Customer;
 use Nette;
 use Nette\Utils\DateTime;
+use Phinx\Util\Util;
 
 class InvitationsRepository extends Repository
 {
@@ -121,6 +122,30 @@ class InvitationsRepository extends Repository
     public function updateCustomerUserNote($id, $user_note)
     {
         $this->findBy(['id' => $id])->update(['user_note' => $user_note,]);
+    }
+
+    // update customer invitation sent log in database
+    public function updateCustomerInvitationSentLog($id)
+    {
+        $this->findBy(['id' => $id])->update(['invitation_sent_log' => new \DateTime()]);
+    }
+
+    // update customer answer log in database
+    public function updateCustomerAnswerLog($id)
+    {
+        $this->findBy(['id' => $id])->update(['answer_log' => new \DateTime()]);
+    }
+
+    // update customer reminder sent log in database
+    public function updateCustomerReminderSentLog($id)
+    {
+        $this->findBy(['id' => $id])->update(['reminder_sent_log' => new \DateTime()]);
+    }
+
+    // update customer confirmation sent log in database
+    public function updateCustomerConfirmationSentLog($id)
+    {
+        $this->findBy(['id' => $id])->update(['confirmation_sent_log' => new \DateTime()]);
     }
 
     // delete customer in database

@@ -55,7 +55,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid = $this->getGrid($name);
         $grid->setDataSource($this->invitationsRepository->findAll());
         $grid->setColumnsHideable();
-        $grid->setPagination(FALSE);
+        //$grid->setPagination(FALSE);
 
         $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
         $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
@@ -138,12 +138,12 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addColumnText("hash", "url")
             ->setDefaultHide();
-/*
+
         $grid->addColumnText("user_note", "Poznámka")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerUserNote($id, $value);
             });
-*/
+
         /*
          * Group Actions
          */
@@ -170,11 +170,11 @@ class InvitationsGridComponent extends BaseGridComponent
             $container->addText('addressing');
             $container->addText('company');
 
-            $container->addText('email')
-                ->setRequired('Zadejte email')
+            $container->addText('email');
+                //->setRequired('Zadejte email')
                 //->setEmptyValue('@')
-                ->addRule(Form::MAX_LENGTH, 'Maximální délka emailu je %d znaků', 30)
-                ->addRule(Form::EMAIL, 'Zadán neplatný email.');
+                //->addRule(Form::MAX_LENGTH, 'Maximální délka emailu je %d znaků', 30)
+                //->addRule(Form::EMAIL, 'Zadán neplatný email.');
 
             $container->addInteger('invitation_count');
 
@@ -183,7 +183,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
             $container->addSelect('is_woman', '', $this->sex);
             $container->addSelect('language', '', $this->language);
-            $container->addText('user_note');
+            //$container->addText('user_note');
         };
 
         $grid->getInlineAdd()->setPositionTop('FALSE');
@@ -258,8 +258,16 @@ class InvitationsGridComponent extends BaseGridComponent
                     Debugger::log($e, 'mailexception');
                 }
 
-                $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
+                if ($emailTemplate == 'invitation'){
+                    $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
+                    $this->invitationsRepository->updateCustomerInvitationSentLog($customer->id);
+                }
+                else if ($emailTemplate == 'reminder'){
+                    $this->invitationsRepository->updateCustomerReminderSentLog($customer->id);
+                }
+
                 Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
+
                 $sentInvitationCount++;
             } catch (\Exception $e) {
                 $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
@@ -304,7 +312,7 @@ class InvitationsGridComponent extends BaseGridComponent
                     Debugger::log($e, 'mailexception');
                 }
 
-                $this->invitationsRepository->updateCustomerIsSent($customer->id, 1);
+                $this->invitationsRepository->updateCustomerConfirmationSentLog($customer->id);
                 Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
                 $sentInvitationCount++;
             } catch (\Exception $e) {
