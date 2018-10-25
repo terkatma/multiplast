@@ -62,6 +62,10 @@ class InvitationsGridComponent extends BaseGridComponent
         $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
         $this->sex = [0 => 'Muž', 1 => 'Žena'];
         $this->language = ['cz' => 'cz', 'en' => 'en'];
+        $invitation_sent_log = ['' => 'Neodesláno', NULL => 'Vše'];
+        $answer_log = [1 => 'Vše', NULL => 'Neodesláno'];
+        $reminder_sent_log = [1 => 'Vše', NULL => 'Neodesláno'];
+        $confirmation_sent_log = [1 => 'Vše', NULL => 'Neodesláno'];
 
         /**
          * @var HomepagePresenter $p
@@ -144,6 +148,23 @@ class InvitationsGridComponent extends BaseGridComponent
                 $this->invitationsRepository->updateCustomerUserNote($id, $value);
             });
 
+        $grid->addColumnNumber('invitation_sent_log', 'LogPozvánka')
+            ->setDefaultHide()
+            ->setSortable();
+ //           ->setFilterSelect($invitation_sent_log);
+        $grid->addColumnNumber('answer_log', 'LogOdpověď')
+            ->setDefaultHide()
+            ->setSortable();
+ //           ->setFilterSelect($answer_log);
+        $grid->addColumnNumber('reminder_sent_log', 'LogUpomínka')
+            ->setDefaultHide()
+            ->setSortable();
+ //           ->setFilterSelect($reminder_sent_log);
+        $grid->addColumnNumber('confirmation_sent_log', 'LogPotvrzení')
+            ->setDefaultHide()
+            ->setSortable();
+ //           ->setFilterSelect($confirmation_sent_log);
+
         /*
          * Group Actions
          */
@@ -152,7 +173,7 @@ class InvitationsGridComponent extends BaseGridComponent
         });
 
         $grid->addGroupAction('odeslat upomínku')->onSelect[] = (function ($ids){
-            $this->sendMail($ids, $emailTemplate = 'reminder');
+            $this->emailSender->sendMail($ids, $emailTemplate = 'reminder');
         });
 
         $grid->addGroupAction('odeslat potvrzení účasti')->onSelect[] = [$this, 'sendConfirmationMail'];
@@ -160,6 +181,11 @@ class InvitationsGridComponent extends BaseGridComponent
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
 
         $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
+
+        $grid->addGroupAction('LogPozvánka')->onSelect[] = [$this, 'generateLogInvitation'];
+        $grid->addGroupAction('LogOdpověď')->onSelect[] = [$this, 'generateLogAnswer'];
+        $grid->addGroupAction('LogUpomínka')->onSelect[] = [$this, 'generateLogReminder'];
+        $grid->addGroupAction('LogPotvrzení')->onSelect[] = [$this, 'generateLogConfirmation'];
 
         /*
          * Inline Add
@@ -345,6 +371,42 @@ class InvitationsGridComponent extends BaseGridComponent
         $presenter = $this->presenter;
         $presenter->handleGeneratePdf($ids);
         $this->presenter->flashMessage("PDF úspěšně vygenerovány.", "success");
+        $this->presenter->redirect("this");
+    }
+
+    public function generateLogInvitation($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->updateCustomerInvitationSentLog($customer->id);
+        }
+        $this->presenter->redirect("this");
+    }
+
+    public function generateLogAnswer($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->updateCustomerAnswerLog($customer->id);
+        }
+        $this->presenter->redirect("this");
+    }
+
+    public function generateLogReminder($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->updateCustomerReminderSentLog($customer->id);
+        }
+        $this->presenter->redirect("this");
+    }
+
+    public function generateLogConfirmation($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->updateCustomerConfirmationSentLog($customer->id);
+        }
         $this->presenter->redirect("this");
     }
 }

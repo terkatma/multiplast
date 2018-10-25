@@ -76,6 +76,7 @@ class ListImportComponent extends BaseComponent
                 $name = trim($name);
                 $addressing = $hi->to($name);
                 $hash = $this->invitationsRepository->generateHash();
+                $reply_deadline = date_create_from_format('d.m.Y', $row[$replyDeadlineIndex]);
                 $this->invitationsRepository->insert([
                     "name" => $row[$nameIndex],
                     "company" => $row[$companyIndex],
@@ -85,7 +86,7 @@ class ListImportComponent extends BaseComponent
                     "is_woman" => $row[$isWomanIndex],
                     "hash" => $hash,
                     "invitation_count" => 2,
-                    "reply_deadline" => $row[$replyDeadlineIndex],
+                    "reply_deadline" => $reply_deadline,
                     "language" => $row[$languageIndex],
                 ]);
             }
