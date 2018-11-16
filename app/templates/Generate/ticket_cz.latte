@@ -1,35 +1,49 @@
 <div style="max-width: 600px">
-<p>Dear {if $customer->is_woman}Mrs{else}Mr{/if} {$customer->addressing},</p>
+<p>{if $customer->is_woman}Vážená paní{else}Vážený pane{/if} {$customer->addressing},</p>
 
-<p>I would like to invite you and your partner on behalf of our company TITAN-MULTIPLAST s.r.o.
-	to traditional pre-Christmas social event on 8.12.2018.</p>
+<p>velice nás těší, že jste
+    {if $customer->is_woman}
+        přijala naše pozvání a potvrdila
+    {else}
+        přijal naše pozvání a potvrdil
+    {/if}
+    svou účast na našem Vánočním večírku spojeném s divadelním představením a rautem.</p>
 
-<p>We would be pleased, if you find time in the pre-Christmas period to enjoy and share
-	memorable evening in theatre located in the Prague centre. Please confirm us your
-	participation till {$customer->reply_deadline->format('d.m.Y')}.</p>
+<p>V příloze Vám zasíláme E-vstupenku pro
+    {if $customer->ticket_count == '2'}
+    2 osoby.
+    {else}
+    1 osobu.
+    {/if} Našim hosteskám se při vstupu stačí prokázat
+    OR kódem na vytištěné vstupence nebo na displeji vašeho mobilního telefonu.</p>
 
-<div style="width: 100%; text-align: center"></div>
-<a href="{$baseUrl}/invitation-answer/{$customer->hash}" ><span style="color: #fff; background-color:
-	#4cae4c; border-color: #4cae4c; display: inline-block;
-    font-size: 14px; text-align: center; vertical-align: middle; touch-action: manipulation;
-    border-radius: 4px; text-decoration: none; line-height: 26px;border: 15px  #4cae4c solid;">Confirm participation</span></a>
+    <p style="color: darkred; font-weight: bold">QR KÓD VSTUPENKY:</p>
+    <p><img src="../files/QRCodes/{date('Y')}/{$customer->id}.png" alt="{$customer->id}"></p>
+    <p><img src="{$basePath}/images/answer-header.png" alt="{$customer->id}"></p>
+    <p><i>QR vstupenku předložte u vstupu</i></p>
 
-<a href="{$baseUrl}/invitation-answer/{$customer->hash}" ><span style="color: #fff;background-color:
-	#2e6da4;border-color: #2e6da4;display: inline-block;
-    font-size: 14px;text-align: center;vertical-align: middle;touch-action: manipulation;
-    border-radius: 4px; text-decoration: none;line-height: 26px; border: 15px #2e6da4 solid; ">Sorry, I won't be able to attend</span></a>
+    <p style="color: darkred; font-weight: bold">TERMÍN</p>
+    <p>sobota <strong>8.12.2018</strong></p>
 
-<p><strong>When and where?</strong><br>
-	- Saturday 8.12.2018<br>
-	- Theater DIVADLO BEZ ZÁBRADLÍ (Jungmannova 31, Praha 1)</p>
+    <p style="color: darkred; font-weight: bold">MÍSTO</p>
+    <p>DIVADLO BEZ ZÁBRADLÍ<br>
+        <strong>Jungmannova 31, Praha 1</strong><br>
+        (Palác Adria, stanice metra Můstek, výstup line B)<br>
+        <a href="https://www.google.com/maps/d/edit?mid=1pGa-jrL_bFqV01XfNd8V7gqsvS9o3pB-&ll=50.08249956587693%2C14.42176848202098&z=19" title="Google Maps">
+            Google mapa - Jak se v centru Prahy dostanete na vánoční večírek a kde můžete zaparkovat</a></p>
 
-<p><strong>What to expect?</strong><br>
-	- 18:00-19:00	Welcome drink and small refreshment in theater’s foayer<br>
-	- 19:00-21:30 Situation comedy from the pen of successful <br>contemporary British
-	playwright Alan Ayckbourn<br>
-	- 21:30-02:00 	Raut with music band in theater’s foayer</p><br>
+    <p style="color: darkred; font-weight: bold">PROGRAM</p>
+    <p>Prostory divadla se otevírají v 18.00 hodin. Místo v hledišti si budete moci vybrat podle Vašeho přání.
+        Představení začne v 19.00 hod. Dress code Smart casual.<br><br>
 
-<p>We are looking forward to meeting you.</p>
+        18:00 welcome drink ve foyer divadla<br>
+        19:00 divadelní představení Kdes to byl/a/ v noci<br>
+        21:30 afterparty ve foyer divadla při poslechu živé hudby<br></p>
+
+    <p>Divadlo Bez zábradlí má omezenou kapacitu, a tak se ani letos bohužel nedostalo na všechny zájemce o účast na vánoční párty.
+        V případě, že byste se nemohli zúčastnit, dejte nám prosím krátkou zprávu, abychom mohli volná místa nabídnout náhradníkům, kteří se do hlediště nevešli. Děkujeme.</p>
+
+<p>Těšíme se na setkání s Vámi.</p>
 
 <div>Ing. Lukáš Horn<br>
 	<span id="ext-gen1540" style="box-sizing: border-box; font-weight: normal; font-size: 8pt; color: rgb(153, 153, 153);">jednatel společnosti / managing director</span><div>

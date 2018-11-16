@@ -17,31 +17,58 @@ class PDFExport
 {
     public function generateInvitationPdf($customer)
     {
-        /* @var Customer $customer*/
+        /* @var Customer $customer */
         $pdf = $this->initPdf("", "P", false);
         $pdf->AddPage();
         $pdf->Image(
-            __INVITATION_BACKGROUNDS_DIR__. date("Y") . "/" . $customer->language . ".png",
+            __INVITATION_BACKGROUNDS_DIR__ . date("Y") . "/" . $customer->language . ".png",
             0,
-            0,210, 297, 'PNG', '', '', false, 300, '', false, false, 0);
+            0, 210, 297, 'PNG', '', '', false, 300, '', false, false, 0);
 
         $pdf->Ln(30.7);
 
         $date = $customer->reply_deadline->format('d.m.Y');
-        if ($customer->language == 'en'){
-            $text = "               ".($customer->is_woman?"Dear Mrs":"Dear Mr")." ".$customer->addressing.",";
+        if ($customer->language == 'en') {
+            $text = "               " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
             $pdf->Write(13.5, "                                         $date");
-        }
-        else{
-            $text = "               ".($customer->is_woman?"Vážená paní":"Vážený pane")." ".$customer->addressing.",";
+        } else {
+            $text = "               " . ($customer->is_woman ? "Vážená paní" : "Vážený pane") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
             $pdf->Write(13.5, "                                        $date");
         }
 
-        $pdf->Output(__INVITATIONS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf", "F");
+        $pdf->Output(__INVITATIONS_DIR__ . "/" . date("Y") . "/" . $customer->id . ".pdf", "F");
+    }
+
+    public function generateTicketPdf($customer)
+    {
+        /* @var Customer $customer */
+        $pdf = $this->initPdf("", "P", false);
+        $pdf->AddPage();
+        $pdf->Image(
+            __TICKET_BACKGROUNDS_DIR__ . date("Y") . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg",
+            0,
+            0, 210, 297, 'JPG', '', '', false, 300, '', false, false, 0);
+
+        $pdf->Ln(30.7);
+
+        // set style for barcode
+        $style = array(
+            'border' => 0,
+            'vpadding' => 'auto',
+            'hpadding' => 'auto',
+            'fgcolor' => array(0, 0, 0),
+            'bgcolor' => false, //array(255,255,255)
+            'module_width' => 1, // width of a single module in points
+            'module_height' => 1 // height of a single module in points
+        );
+
+        $pdf->write2DBarcode($customer->hash, 'QRCODE,L', 146, 27, 43, 43, $style, 'N');
+
+        $pdf->Output(__TICKETS_DIR__ . "/" . date("Y") . "/" . $customer->id . ".pdf", "F");
     }
 
     private function initPdf($title = "", $orientation = "P", $addPage = true, $format = "A4")

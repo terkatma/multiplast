@@ -31,6 +31,8 @@
 	{*end datagrid js*}
 
 	<script type="text/javascript" src="{$basePath}/js/main.js"></script>
+	<!-- Include bootstrap-select.js when using FilterMultiSelect (silviomoreto.github.io/bootstrap-select) -->
+	<script src="{$basePath}/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
 
 	<link rel="stylesheet" type="text/css" href="{$basePath}/css/font_awesome/css/all.css">
 	<link rel="stylesheet" href="{$basePath}/css/font_awesome/css/v4-shims.css">
@@ -40,12 +42,14 @@
 	<link rel="stylesheet" href="{$basePath}/css/jquery-ui.css" type="text/css" media="all"/>
 	<link rel="stylesheet" href="{$basePath}/css/bootstrap.css" media="screen">
 	<link rel="stylesheet" href="{$basePath}/css/styles.css" media="screen">
+	<!-- Include this css when using FilterMultiSelect (silviomoreto.github.io/bootstrap-select) -->
+	<link rel="stylesheet" type="text/css" href="{$basePath}/bower_components/bootstrap-select/dist/css/bootstrap-select.css">
 
 	<link rel="stylesheet" href="https://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css"
 		  media="all"/>
 
 
-	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
+	<title>{ifset title}{include title|stripHtml} | {/ifset}Mailer Multiplast</title>
 </head>
 
 <body>

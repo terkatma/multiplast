@@ -12,6 +12,7 @@ use Nette\Utils\Random;
 use app\entities\Customer;
 use Tracy\Debugger;
 use Nette\Forms\Container;
+use Endroid\QrCode\QrCode;
 
 /**
  * Class InvitationAnswerComponent
@@ -75,6 +76,7 @@ class InvitationsGridComponent extends BaseGridComponent
          * Columns
          */
         $grid->addColumnNumber("id", "Id")
+            ->setSortable()
             ->setDefaultHide();
 
         $grid->addColumnText("name", "Jméno")
@@ -103,15 +105,11 @@ class InvitationsGridComponent extends BaseGridComponent
                     $this->presenter->redirect("this");
             });
 
-        $grid->addColumnNumber('invitation_count', 'Pozvaných')
+        $grid->addColumnNumber('invitation_count', 'Pozv.')
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerInvitationCount($id, $value);
-            });
-
-        $grid->addColumnNumber('ticket_count', 'Potvrzených')
-            ->setFilterSelect($ticket_count);
-
-        $grid->addColumnText("note", "Poznámka zákazníka");
+            })
+            ->setDefaultHide();
 
         $grid->addColumnNumber("is_sent", "Odesláno")
             ->setReplacement($is_sent)
@@ -120,6 +118,11 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addColumnNumber("is_answered", "Odpověď")
             ->setReplacement($is_answered)
             ->setFilterSelect($is_answered);
+
+        $grid->addColumnNumber('ticket_count', 'Potvrz.')
+            ->setFilterMultiSelect($ticket_count);
+
+        $grid->addColumnText("note", "Poznámka zákazníka");
 
         $grid->addColumnDateTime("reply_deadline", "Termín odpovědi")
             ->setEditableCallback(function($id, $value) {
@@ -132,18 +135,20 @@ class InvitationsGridComponent extends BaseGridComponent
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerIsWoman($id, $value);
             })
-            ->setReplacement($this->sex);
+            ->setReplacement($this->sex)
+            ->setDefaultHide();
 
         $grid->addColumnText("language", "Jazyk")
             ->setEditableInputTypeSelect($this->language)
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerLanguage($id, $value);
-            });
+            })
+            ->setDefaultHide();
 
         $grid->addColumnText("hash", "url")
             ->setDefaultHide();
 
-        $grid->addColumnText("user_note", "Poznámka")
+        $grid->addColumnText("user_note", "Naše poznámka")
             ->setEditableCallback(function($id, $value) {
                 $this->invitationsRepository->updateCustomerUserNote($id, $value);
             });
@@ -164,10 +169,17 @@ class InvitationsGridComponent extends BaseGridComponent
             ->setDefaultHide()
             ->setSortable();
  //           ->setFilterSelect($confirmation_sent_log);
+        $grid->addColumnNumber('ticket_sent_log', 'LogVstupenky')
+            ->setDefaultHide()
+            ->setSortable();
+        //           ->setFilterSelect($confirmation_sent_log);
 
         /*
          * Group Actions
          */
+        $grid->addGroupAction('vygenerovat pozzvánku (PDF)')->onSelect[] = [$this, 'generateInvitationPDFs'];
+        $grid->addGroupAction('vygenerovat vstupenku (PDF)')->onSelect[] = [$this, 'generateTicketPDFs'];
+
         $grid->addGroupAction('odeslat pozvánku')->onSelect[] = (function ($ids){
             $this->sendMail($ids, $emailTemplate = 'invitation');
         });
@@ -178,14 +190,14 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addGroupAction('odeslat potvrzení účasti')->onSelect[] = [$this, 'sendConfirmationMail'];
 
+        $grid->addGroupAction('odeslat vstupenky')->onSelect[] = [$this, 'sendTicketMail'];
+
         //$grid->addGroupAction('vygenerovat hash')->onSelect[] = [$this, 'generateHash'];
-
-        $grid->addGroupAction('vygenerovat PDF')->onSelect[] = [$this, 'generatePDFs'];
-
-        $grid->addGroupAction('LogPozvánka')->onSelect[] = [$this, 'generateLogInvitation'];
-        $grid->addGroupAction('LogOdpověď')->onSelect[] = [$this, 'generateLogAnswer'];
-        $grid->addGroupAction('LogUpomínka')->onSelect[] = [$this, 'generateLogReminder'];
-        $grid->addGroupAction('LogPotvrzení')->onSelect[] = [$this, 'generateLogConfirmation'];
+        $grid->addGroupAction('(LogPozvánka)')->onSelect[] = [$this, 'generateLogInvitation'];
+        $grid->addGroupAction('(LogOdpověď)')->onSelect[] = [$this, 'generateLogAnswer'];
+        $grid->addGroupAction('(LogUpomínka)')->onSelect[] = [$this, 'generateLogReminder'];
+        $grid->addGroupAction('(LogPotvrzení)')->onSelect[] = [$this, 'generateLogConfirmation'];
+        $grid->addGroupAction('(LogVstupenky)')->onSelect[] = [$this, 'generateLogTicket'];
 
         /*
          * Inline Add
@@ -350,6 +362,62 @@ class InvitationsGridComponent extends BaseGridComponent
         $this->presenter->redirect("this");
     }
 
+    public function sendTicketMail($ids){
+
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        Debugger::log('ODESLÁNÍ VSTUPENEK ZÁKAZNÍKŮM====================; ID ');
+
+        $sentTicketCount = 0;
+        $date = date("Y");
+
+        foreach ($customers as $customer) {
+            /* @var Customer $customer */
+
+            $qrCode = new QrCode($customer->hash);
+            $qrCode->setSize(300);
+            $qrCode->writeFile(__QRCODES_DIR__.'/' . date("Y") . '/' . $customer->id . '.png');
+
+            $mail = new Message;
+            $template = parent::createTemplate();
+            $template->customer = $customer;
+            //Debugger::log('ODESÍLÁNÍ [' . $customer->id . '] [' . $customer->email . '] [' . $customer->name . '] [' . $customer->company . ']; ID ');
+            if ($customer->language == 'en'){
+                $subject = "Christmas party $date - tickets";
+                $attachement = 'e-ticket';
+            }
+            else {
+                $subject = "Vánoční večírek $date - vstupenky";
+                $attachement = 'elektronická vstupenka';
+            }
+            $mail->setSubject($subject);
+            $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
+            $mail->addAttachment("$subject - $attachement.pdf", file_get_contents(__TICKETS_DIR__."/" . date("Y") . "/" . $customer->id . ".pdf"));
+            $template->setFile(__MAIL_DIR__ . '/Generate/ticket_' . $customer->language . '.latte');
+            $mail->setHtmlBody($template);
+            Debugger::log('OK    Připojena příloha [' . $customer->id . '] ' . $customer->email . '; ID ');
+
+            try {
+                $mail->addTo($customer["email"]);
+                try {
+                    $this->mailer->smtpMailer->send($mail);
+                } catch (SendException $e) {
+                    Debugger::log($e, 'mailexception');
+                }
+
+                $this->invitationsRepository->updateCustomerTicketSentLog($customer->id);
+                Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
+
+                $sentTicketCount++;
+            } catch (\Exception $e) {
+                $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
+                Debugger::log('ERROR Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
+            }
+
+        }
+        $this->presenter->flashMessage("Dokončeno. Odesláno $sentTicketCount emailů.", 'success');
+        $this->presenter->redirect("this");
+    }
+
     public function generateHash($ids){
 
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
@@ -365,12 +433,21 @@ class InvitationsGridComponent extends BaseGridComponent
         $this->presenter->redirect("this");
     }
 
-    public function generatePDFs($ids)
+    public function generateInvitationPDFs($ids)
     {
         /* @var HomepagePresenter $presenter*/
         $presenter = $this->presenter;
-        $presenter->handleGeneratePdf($ids);
-        $this->presenter->flashMessage("PDF úspěšně vygenerovány.", "success");
+        $presenter->handleGenerateInvitationPdf($ids);
+        $this->presenter->flashMessage("Pozvánky (PDF) úspěšně vygenerovány.", "success");
+        $this->presenter->redirect("this");
+    }
+
+    public function generateTicketPDFs($ids)
+    {
+        /* @var HomepagePresenter $presenter*/
+        $presenter = $this->presenter;
+        $presenter->handleGenerateTicketPdf($ids);
+        $this->presenter->flashMessage("Vstupenky (PDF) úspěšně vygenerovány.", "success");
         $this->presenter->redirect("this");
     }
 
@@ -406,6 +483,15 @@ class InvitationsGridComponent extends BaseGridComponent
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
         foreach ($customers as $customer) {
             $this->invitationsRepository->updateCustomerConfirmationSentLog($customer->id);
+        }
+        $this->presenter->redirect("this");
+    }
+
+    public function generateLogTicket($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->updateCustomerTicketSentLog($customer->id);
         }
         $this->presenter->redirect("this");
     }

@@ -68,7 +68,7 @@ final class HomepagePresenter extends BaseSecuredPresenter
         $this->template->isAnsweredCount = $this->invitationsRepository->findAll()->sum("is_answered");
     }
 
-    public function handleGeneratePdf($ids) {
+    public function handleGenerateInvitationPdf($ids) {
         /* @var Customer[] $customers */
         $customers = $this->invitationsRepository
             ->findAll()
@@ -81,6 +81,22 @@ final class HomepagePresenter extends BaseSecuredPresenter
 
         foreach ($customers as $customer) {
             $this->pdfExport->generateInvitationPdf($customer);
+        }
+    }
+
+    public function handleGenerateTicketPdf($ids) {
+        /* @var Customer[] $customers */
+        $customers = $this->invitationsRepository
+            ->findAll()
+            ->where("id", $ids)
+            ->fetchAll();
+
+        if (!is_dir(__TICKETS_DIR__."/" . date("Y") . "/")) {
+            mkdir(__TICKETS_DIR__."/" . date("Y") . "/", 0777, true);
+        }
+
+        foreach ($customers as $customer) {
+            $this->pdfExport->generateTicketPdf($customer);
         }
     }
 

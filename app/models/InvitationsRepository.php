@@ -148,6 +148,12 @@ class InvitationsRepository extends Repository
         $this->findBy(['id' => $id])->update(['confirmation_sent_log' => new \DateTime()]);
     }
 
+    // update customer confirmation sent log in database
+    public function updateCustomerTicketSentLog($id)
+    {
+        $this->findBy(['id' => $id])->update(['ticket_sent_log' => new \DateTime()]);
+    }
+
     // delete customer in database
     public function deleteCustomer($id){
 

@@ -23,7 +23,8 @@
 		"ublaboo/datagrid": "^5.4",
 		"robmorgan/phinx": "^0.10.6",
 		"ondrs/hi": "^0.3.1",
-		"tecnickcom/tcpdf": "^6.2"
+		"tecnickcom/tcpdf": "^6.2",
+		"endroid/qr-code": "^2.5"
 	},
 	"require-dev": {
 		"nette/tester": "^2.0"
