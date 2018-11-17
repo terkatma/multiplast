@@ -3,9 +3,11 @@
 namespace App\Components;
 
 use App\Presenters\HomepagePresenter;
+use Nette\Database\Table\Selection;
 use Nette\Forms\Form;
 use Nette\Mail\SendException;
 use Nette\Utils\Validators;
+use Tracy\OutputDebugger;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
 use Nette\Utils\Random;
@@ -86,13 +88,13 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addColumnText("addressing", "Oslovení")
             ->setEditableCallback(function($id, $value) {
-                $this->invitationsRepository->updateCustomerAddressing($id, $value);
+                $this->invitationsRepository->update($id, ["addressing" => $value]);
             })
             ->setSortable();
 
         $grid->addColumnText("company", "Firma")
             ->setEditableCallback(function($id, $value) {
-                $this->invitationsRepository->updateCustomerCompany($id, $value);
+                $this->invitationsRepository->update($id, ['company' => $value]);
             })
             ->setSortable();
 
@@ -157,9 +159,18 @@ class InvitationsGridComponent extends BaseGridComponent
             ->setDefaultHide()
             ->setSortable();
  //           ->setFilterSelect($invitation_sent_log);
-        $grid->addColumnNumber('answer_log', 'LogOdpověď')
+        $grid->addColumnDateTime('answer_log', 'LogOdpověď')
             ->setDefaultHide()
-            ->setSortable();
+            ->setSortable()
+            ->setFilterDate()
+            ->setCondition(function ($a, $b) {
+                /* @var Selection $a*/
+                if ($b == "NULL") {
+                    $a->where("answer_log IS NULL");
+                } else {
+                    $a->where("answer_log IS NOT NULL");
+                }
+            });
  //           ->setFilterSelect($answer_log);
         $grid->addColumnNumber('reminder_sent_log', 'LogUpomínka')
             ->setDefaultHide()
@@ -370,12 +381,16 @@ class InvitationsGridComponent extends BaseGridComponent
         $sentTicketCount = 0;
         $date = date("Y");
 
+        if (!is_dir(__QRCODES_DIR__."/" . $date . "/")) {
+            mkdir(__QRCODES_DIR__."/" . $date . "/", 0777, true);
+        }
+
         foreach ($customers as $customer) {
             /* @var Customer $customer */
 
             $qrCode = new QrCode($customer->hash);
             $qrCode->setSize(300);
-            $qrCode->writeFile(__QRCODES_DIR__.'/' . date("Y") . '/' . $customer->id . '.png');
+            $qrCode->writeFile(__QRCODES_DIR__.'/' . $date . '/' . $customer->id . '.png');
 
             $mail = new Message;
             $template = parent::createTemplate();

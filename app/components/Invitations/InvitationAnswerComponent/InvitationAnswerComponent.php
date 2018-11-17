@@ -76,7 +76,7 @@ class InvitationAnswerComponent extends BaseGridComponent
         $this->invitationsRepository->updateCustomerIsAnswered($this->customerId->id, 1);
         $this->invitationsRepository->updateCustomerAnswerLog($this->customerId->id);
 
-        $this->customerId->language == 'en'?$message = 'Save':$message = 'Uloženo';
+        $message = $this->customerId->language == 'en'?'Save':'Uloženo';
         $this->getPresenter()->flashMessage($message, 'success');
     }
 

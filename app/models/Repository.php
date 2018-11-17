@@ -79,4 +79,9 @@ abstract class Repository
     {
         return $this->getTable()->insert($values);
     }
+
+    public function update($id, $values)
+    {
+        $this->findBy(['id' => $id])->update($values);
+    }
 }

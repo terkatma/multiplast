@@ -66,10 +66,6 @@ class InvitationsRepository extends Repository
     }
 
     // update customer company in database
-    public function updateCustomerCompany($id, $company)
-    {
-        $this->findBy(['id' => $id])->update(['company' => $company,]);
-    }
 
     // update customer email in database
     public function updateCustomerEmail($id, $email)
