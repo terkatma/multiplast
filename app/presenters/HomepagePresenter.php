@@ -69,14 +69,16 @@ final class HomepagePresenter extends BaseSecuredPresenter
     }
 
     public function handleGenerateInvitationPdf($ids) {
+        $date = date("Y");
+
         /* @var Customer[] $customers */
         $customers = $this->invitationsRepository
             ->findAll()
             ->where("id", $ids)
             ->fetchAll();
 
-        if (!is_dir(__INVITATIONS_DIR__."/" . date("Y") . "/")) {
-            mkdir(__INVITATIONS_DIR__."/" . date("Y") . "/", 0777, true);
+        if (!is_dir(__INVITATIONS_DIR__."/" . $date . "/")) {
+            mkdir(__INVITATIONS_DIR__."/" . $date . "/", 0777, true);
         }
 
         foreach ($customers as $customer) {
@@ -85,14 +87,15 @@ final class HomepagePresenter extends BaseSecuredPresenter
     }
 
     public function handleGenerateTicketPdf($ids) {
+        $date = date("Y");
         /* @var Customer[] $customers */
         $customers = $this->invitationsRepository
             ->findAll()
             ->where("id", $ids)
             ->fetchAll();
 
-        if (!is_dir(__TICKETS_DIR__."/" . date("Y") . "/")) {
-            mkdir(__TICKETS_DIR__."/" . date("Y") . "/", 0777, true);
+        if (!is_dir(__TICKETS_DIR__."/" . $date . "/")) {
+            mkdir(__TICKETS_DIR__."/" . $date . "/", 0777, true);
         }
 
         foreach ($customers as $customer) {

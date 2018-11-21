@@ -17,39 +17,47 @@ class PDFExport
 {
     public function generateInvitationPdf($customer)
     {
+        $year = date("Y");
+
         /* @var Customer $customer */
         $pdf = $this->initPdf("", "P", false);
         $pdf->AddPage();
         $pdf->Image(
-            __INVITATION_BACKGROUNDS_DIR__ . date("Y") . "/" . $customer->language . ".png",
+            //TODO neexistujici soubor - pozadi pdf
+            __INVITATION_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . ".png",
             0,
             0, 210, 297, 'PNG', '', '', false, 300, '', false, false, 0);
 
         $pdf->Ln(30.7);
 
-        $date = $customer->reply_deadline->format('d.m.Y');
-        if ($customer->language == 'en') {
-            $text = "               " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
-            $pdf->Write(13.5, $text);
-            $pdf->Ln(204.6);
-            $pdf->Write(13.5, "                                         $date");
-        } else {
+        $date = $customer->reply_deadline->format('j. n. Y');
+        if ($customer->language == 'cz') {
             $text = "               " . ($customer->is_woman ? "Vážená paní" : "Vážený pane") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(204.6);
             $pdf->Write(13.5, "                                        $date");
+        } else {
+            $text = "               " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
+            $pdf->Write(13.5, $text);
+            $pdf->Ln(204.6);
+            $pdf->Write(13.5, "                                         $date");
         }
 
-        $pdf->Output(__INVITATIONS_DIR__ . "/" . date("Y") . "/" . $customer->id . ".pdf", "F");
+        if (!is_dir(__INVITATIONS_DIR__ . "/" . $year . "/")) {
+            mkdir(__INVITATIONS_DIR__ . "/" . $year . "/", 0777, true);
+        }
+
+        $pdf->Output(__INVITATIONS_DIR__ . "/" . $year . "/" . $customer->id . ".pdf", "F");
     }
 
     public function generateTicketPdf($customer)
     {
+        $year = date("Y");
         /* @var Customer $customer */
         $pdf = $this->initPdf("", "P", false);
         $pdf->AddPage();
         $pdf->Image(
-            __TICKET_BACKGROUNDS_DIR__ . date("Y") . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg",
+            __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg",
             0,
             0, 210, 297, 'JPG', '', '', false, 300, '', false, false, 0);
 
@@ -68,7 +76,11 @@ class PDFExport
 
         $pdf->write2DBarcode($customer->hash, 'QRCODE,L', 146, 27, 43, 43, $style, 'N');
 
-        $pdf->Output(__TICKETS_DIR__ . "/" . date("Y") . "/" . $customer->id . ".pdf", "F");
+        if (!is_dir(__TICKETS_DIR__ . "/" . $year . "/")) {
+            mkdir(__TICKETS_DIR__ . "/" . $year . "/", 0777, true);
+        }
+
+        $pdf->Output(__TICKETS_DIR__ . "/" . $year . "/" . $customer->id . ".pdf", "F");
     }
 
     private function initPdf($title = "", $orientation = "P", $addPage = true, $format = "A4")
@@ -97,9 +109,6 @@ class PDFExport
             }
 
             $pdf->Ln(5);
-            //$pdf->SetFont('courier','', 13.5);
-            //$pdf->setFontSubsetting(true);
-            //$pdf->addFont(__FONTS_DIR__ . "arial.ttf", 'TrueTypeUnicode', 32);
         }
 
         return $pdf;
