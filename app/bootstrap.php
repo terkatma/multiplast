@@ -17,7 +17,8 @@ $configurator->createRobotLoader()
 define('__MAIL_DIR__', __DIR__ . '/templates/');
 define('__CACHE_DIR__', __DIR__ . '/../temp/cache/');
 define('__FONTS_DIR__', __DIR__ . '/../files/fonts/');
-define('__QRCODES_DIR__', __DIR__ . '/../files/QRCodes/');
+//define('__QRCODES_DIR__', __DIR__ . '/../files/QRCodes/');
+define('__QRCODES_DIR__', __DIR__ . '/../www/images/QRCodes/');
 define('__INVITATIONS_DIR__', __DIR__ . '/../files/invitations/');
 define('__INVITATION_BACKGROUNDS_DIR__', __DIR__ . '/../files/invitationBackgrounds/');
 define('__TICKETS_DIR__', __DIR__ . '/../files/tickets/');

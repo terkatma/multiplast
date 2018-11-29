@@ -156,7 +156,7 @@ class InvitationsGridComponent extends BaseGridComponent
                 $this->invitationsRepository->update($id, ["user_note" => $value]);
             });
 
-        $grid->addColumnNumber('invitation_sent_log', 'LogPozvánka')
+        $grid->addColumnDateTime('invitation_sent_log', 'LogPozvánka')
             ->setDefaultHide()
             ->setSortable()
             ->setFilterDate()
@@ -221,7 +221,7 @@ class InvitationsGridComponent extends BaseGridComponent
          * Group Actions
          */
         $grid->addGroupAction('vygenerovat pozzvánku (PDF)')->onSelect[] = [$this, 'generateInvitationPDFs'];
-        $grid->addGroupAction('vygenerovat vstupenku (PDF)')->onSelect[] = [$this, 'generateTicketPDFs'];
+        $grid->addGroupAction('vygenerovat vstupenku (PDF) - pouze cz')->onSelect[] = [$this, 'generateTicketPDFs'];
 
         $grid->addGroupAction('odeslat pozvánku')->onSelect[] = (function ($ids){
             $this->sendMail($ids, $emailTemplate = 'invitation');
@@ -233,7 +233,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addGroupAction('odeslat potvrzení účasti')->onSelect[] = [$this, 'sendConfirmationMail'];
 
-        $grid->addGroupAction('odeslat vstupenky')->onSelect[] = [$this, 'sendTicketMail'];
+        $grid->addGroupAction('vygenerovat QR kód a odeslat vstupenky - pouze cz')->onSelect[] = [$this, 'sendTicketMail'];
 
         $grid->addGroupAction('(LogPozvánka)')->onSelect[] = [$this, 'generateLogInvitation'];
         $grid->addGroupAction('(LogOdpověď)')->onSelect[] = [$this, 'generateLogAnswer'];
@@ -280,7 +280,7 @@ class InvitationsGridComponent extends BaseGridComponent
             }
         };
 
-
+/*
         $grid->addActionCallback('delete', '')
             ->setIcon('trash')
             ->setTitle('Smazat')
@@ -291,7 +291,7 @@ class InvitationsGridComponent extends BaseGridComponent
             $this->presenter->flashMessage("Zákazník [$id] smazán.",'success');
             $this->presenter->redirect("this");
         };
-
+*/
         $grid->setColumnsSummary(['invitation_count','ticket_count', 'is_sent','is_answered']);
 
         return $grid;
@@ -420,7 +420,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
             $qrCode = new QrCode($customer->hash);
             $qrCode->setSize(300);
-            $qrCode->writeFile(__QRCODES_DIR__.'/' . $date . '/' . $customer->id . '.png');
+            $qrCode->writeFile(__QRCODES_DIR__.'/' . $date . '/' . $customer->hash . '.png');
 
             $mail = new Message;
             $template = parent::createTemplate();
@@ -473,6 +473,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
     public function generateTicketPDFs($ids)
     {
+        //TODO ošetřit vstupy - potvrzená účast
         /* @var HomepagePresenter $presenter*/
         $presenter = $this->presenter;
         $presenter->handleGenerateTicketPdf($ids);

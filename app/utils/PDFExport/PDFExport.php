@@ -56,6 +56,7 @@ class PDFExport
         /* @var Customer $customer */
         $pdf = $this->initPdf("", "P", false);
         $pdf->AddPage();
+        $tmp = __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg";
         $pdf->Image(
             __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg",
             0,
