@@ -221,7 +221,7 @@ class InvitationsGridComponent extends BaseGridComponent
          * Group Actions
          */
         $grid->addGroupAction('vygenerovat pozzvánku (PDF)')->onSelect[] = [$this, 'generateInvitationPDFs'];
-        $grid->addGroupAction('vygenerovat vstupenku (PDF) - pouze cz')->onSelect[] = [$this, 'generateTicketPDFs'];
+        $grid->addGroupAction('vygenerovat vstupenku (PDF)')->onSelect[] = [$this, 'generateTicketPDFs'];
 
         $grid->addGroupAction('odeslat pozvánku')->onSelect[] = (function ($ids){
             $this->sendMail($ids, $emailTemplate = 'invitation');
@@ -233,7 +233,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $grid->addGroupAction('odeslat potvrzení účasti')->onSelect[] = [$this, 'sendConfirmationMail'];
 
-        $grid->addGroupAction('vygenerovat QR kód a odeslat vstupenky - pouze cz')->onSelect[] = [$this, 'sendTicketMail'];
+        $grid->addGroupAction('vygenerovat QR kód a odeslat vstupenky')->onSelect[] = [$this, 'sendTicketMail'];
 
         $grid->addGroupAction('(LogPozvánka)')->onSelect[] = [$this, 'generateLogInvitation'];
         $grid->addGroupAction('(LogOdpověď)')->onSelect[] = [$this, 'generateLogAnswer'];
