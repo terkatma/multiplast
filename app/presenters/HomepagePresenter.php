@@ -5,8 +5,10 @@ namespace App\Presenters;
 use App\Components\IInvitationsGridComponentFactory;
 use App\Components\IListImportComponentFactory;
 use App\Components\InvitationsGridComponent;
+use App\Components\IParticipantsListImportComponentFactory;
 use App\Components\ISignInComponentFactory;
 use App\Components\ListImportComponent;
+use App\Components\ParticipantsListImportComponent;
 use App\Components\SignInComponent;
 use app\entities\Customer;
 
@@ -36,6 +38,12 @@ final class HomepagePresenter extends BaseSecuredPresenter
      * @var IListImportComponentFactory
      */
     public $listImportComponentFactory;
+
+    /**
+     * @inject
+     * @var IParticipantsListImportComponentFactory
+     */
+    public $participantsListImportComponentFactory;
 
     /**
      * @inject
@@ -109,6 +117,14 @@ final class HomepagePresenter extends BaseSecuredPresenter
     public function createComponentListImport()
     {
         return $this->listImportComponentFactory->create();
+    }
+
+    /**
+     * @return ParticipantsListImportComponent
+     */
+    public function createComponentParticipantsListImport()
+    {
+        return $this->participantsListImportComponentFactory->create();
     }
 
     public function handleCreateCustomer($values)

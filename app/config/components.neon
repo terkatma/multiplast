@@ -14,3 +14,7 @@ services:
     invitationAnswerComponentFactory:
         implement: App\Components\IInvitationAnswerComponentFactory
         inject: yes
+
+    participantsListImportComponentFactory:
+        implement: App\Components\IParticipantsListImportComponentFactory
+        inject: yes

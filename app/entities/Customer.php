@@ -69,4 +69,7 @@ class Customer extends ActiveRow
 
     /* @var \DateTime confirmation_sent_log*/
     public $confirmation_sent_log;
+
+    /* @var bool participated*/
+    public $participated;
 }

@@ -63,6 +63,7 @@ class InvitationsGridComponent extends BaseGridComponent
 
         $ticket_count = ['' => 'Vše', 0 => 'Odmítli', 1 => '1', 2 => '2'];
         $is_sent = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
+        $participated = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
         $is_answered = ['' => 'Vše', 0 => 'Ne', 1 => 'Ano'];
         $this->sex = [0 => 'Muž', 1 => 'Žena'];
         $this->language = ['cz' => 'cz', 'en' => 'en'];
@@ -216,6 +217,15 @@ class InvitationsGridComponent extends BaseGridComponent
                     $customer->where("ticket_sent_log IS NOT NULL");
                 }
             });
+        $grid->addColumnNumber('participated', 'Účast')
+            ->setDefaultHide()
+            ->setEditableInputTypeSelect([0 => 'Ne', 1 => 'Ano'])
+            ->setSortable()
+            ->setEditableCallback(function($id, $value) {
+                $this->invitationsRepository->update($id, ["participated" => $value]);
+            })
+            ->setReplacement($participated)
+            ->setFilterSelect($participated);
 
         /*
          * Group Actions
@@ -240,6 +250,7 @@ class InvitationsGridComponent extends BaseGridComponent
         $grid->addGroupAction('(LogUpomínka)')->onSelect[] = [$this, 'generateLogReminder'];
         $grid->addGroupAction('(LogPotvrzení)')->onSelect[] = [$this, 'generateLogConfirmation'];
         $grid->addGroupAction('(LogVstupenky)')->onSelect[] = [$this, 'generateLogTicket'];
+        $grid->addGroupAction('Označit - zúčastnil/a se')->onSelect[] = [$this, 'generateParticipatedFlag'];
 
         /*
          * Inline Add
@@ -292,7 +303,7 @@ class InvitationsGridComponent extends BaseGridComponent
             $this->presenter->redirect("this");
         };
 */
-        $grid->setColumnsSummary(['invitation_count','ticket_count', 'is_sent','is_answered']);
+        $grid->setColumnsSummary(['invitation_count','ticket_count', 'is_sent','is_answered','participated']);
 
         return $grid;
     }
@@ -522,6 +533,15 @@ class InvitationsGridComponent extends BaseGridComponent
         $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
         foreach ($customers as $customer) {
             $this->invitationsRepository->update($customer->id, ['ticket_sent_log' => new \DateTime()]);
+        }
+        $this->presenter->redirect("this");
+    }
+
+    public function generateParticipatedFlag($ids)
+    {
+        $customers = $this->invitationsRepository->findAll()->where("id", $ids)->fetchAll();
+        foreach ($customers as $customer) {
+            $this->invitationsRepository->update($customer->id, ['participated' => 1]);
         }
         $this->presenter->redirect("this");
     }

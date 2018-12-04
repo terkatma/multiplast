@@ -68,6 +68,13 @@ class InvitationsRepository extends Repository
             ->fetch();
     }
 
+    public function findHash($hash)
+    {
+        return $this
+            ->findBy(["hash" => $hash])
+            ->fetch();
+    }
+
     public function getIdByHash($hash)
     {
         return $this->findBy(['hash' => $hash])->fetch();
