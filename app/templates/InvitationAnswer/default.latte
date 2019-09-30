@@ -17,6 +17,10 @@
 			<strong>Name: </strong>{$customer->name}<br> <strong>Company: </strong>{$customer->company}
 		{/if}
 	</p>
+	{if ($now > $deadline)}
+	<p>Přihlašování ukončeno</p>
+	{else}
 	{control invitationAnswer}
+	{/if}
 </div>
 {/block}

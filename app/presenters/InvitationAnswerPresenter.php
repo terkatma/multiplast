@@ -44,5 +44,7 @@ final class InvitationAnswerPresenter extends Nette\Application\UI\Presenter
             throw new Nette\Application\BadRequestException();
         }
         $this->template->customer = $this->invitationsRepository->getIdByHash($hash);
+        $this->template->now = new \DateTime();
+        $this->template->deadline = new \DateTime('2019-12-06');
     }
 }

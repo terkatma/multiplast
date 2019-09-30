@@ -46,7 +46,7 @@ class ParticipantsListImportComponent extends BaseComponent
 
     public function participantsListImportSubmitted(Nette\Application\UI\Form $form)
     {
-        $hashIndex = 1;
+        $hashIndex = 0;
         $values = $form->getValues();
 
         $file = $values['csv_file'];
@@ -55,8 +55,8 @@ class ParticipantsListImportComponent extends BaseComponent
         Debugger::log('Nahrávání seznamu zúčastněných...; ID ', 'debug');
         foreach ($csv as $row){
             $row = array_values($row);
-            $customer = $this->invitationsRepository->getIdByHash($row[$hashIndex]);
-            $id = $customer->id;
+            $id = $this->invitationsRepository->getIdByHash($row[$hashIndex]);
+            //$id = $customer->id;
             $this->invitationsRepository->update($id, ['participated' => 1]);
         }
 
