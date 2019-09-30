@@ -28,19 +28,19 @@ class PDFExport
             0,
             0, 210, 297, 'PNG', '', '', false, 300, '', false, false, 0);
 
-        $pdf->Ln(30.7);
+        $pdf->Ln(107.7);
 
         $date = $customer->reply_deadline->format('j. n. Y');
         if ($customer->language == 'cz') {
-            $text = "               " . ($customer->is_woman ? "Vážená paní" : "Vážený pane") . " " . $customer->addressing . ",";
+            $text = "             " . ($customer->is_woman ? "Vážená paní" : "Vážený pane") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
-            $pdf->Ln(204.6);
-            $pdf->Write(13.5, "                                        $date");
+            $pdf->Ln(125.6);
+            $pdf->Write(13.5, "                                                          $date");
         } else {
-            $text = "               " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
+            $text = "             " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
-            $pdf->Ln(204.6);
-            $pdf->Write(13.5, "                                         $date");
+            $pdf->Ln(125.6);
+            $pdf->Write(13.5, "                                                          $date");
         }
 
         if (!is_dir(__INVITATIONS_DIR__ . "/" . $year . "/")) {
@@ -100,7 +100,7 @@ class PDFExport
         $pdf->SetAutoPageBreak(false, 0);
 
         $pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
-        $pdf->SetFont("DeJaVuSans",'', 11.5, true);
+        $pdf->SetFont("DeJaVuSans",'', 13, true);
 
         if ($addPage) {
             $pdf->AddPage();

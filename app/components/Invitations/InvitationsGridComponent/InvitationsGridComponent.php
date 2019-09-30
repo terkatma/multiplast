@@ -334,7 +334,7 @@ class InvitationsGridComponent extends BaseGridComponent
                 $attachement = 'invitation';
             }
             $mail->setSubject($subject);
-            $mail->setFrom('lukas.horn@titan-multiplast.cz', 'Ing. Lukáš Horn');
+            $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
             $mail->addAttachment("$subject - $attachement.pdf", file_get_contents(__INVITATIONS_DIR__."/" . $date . "/" . $customer->id . ".pdf"));
             $template->setFile(__MAIL_DIR__ . '/Generate/' . $emailTemplate . '_' . $customer->language . '.latte');
             $mail->setHtmlBody($template);
