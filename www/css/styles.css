@@ -20,11 +20,11 @@ div.flash.error {
 
 #answerBox {
     max-width:500px;
-    border:1px solid #666;
+    /*border:1px solid #666;
     border-radius: 3px;
-    margin:30px auto;
     padding:20px;
-    background-color:white;
+    background-color:white;*/
+    margin:30px auto;
 }
 
 
@@ -37,12 +37,12 @@ div.flash.error {
 }
 
 #answerBox form {
-    background-color:#e4f1ff;
-    border-radius:2px;
+    background-color: #a3a3a3;
+    /*border-radius:2px;*/
     padding: 20px;
 }
 #answerBox form input.btn {
-    background-color:#009ee0;
+    background-color: #b72c2d;
     color:white;
 }
 
@@ -55,8 +55,8 @@ div.flash.error {
     background-color:white;
 }
 #answerBox label:hover {
-    background-color:#009ee0;
-    color:white;
+    background-color: rgb(224, 224, 224);
+    color:black;
 }
 
 #answerBox .radio br {

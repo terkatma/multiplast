@@ -230,7 +230,7 @@ class InvitationsGridComponent extends BaseGridComponent
         /*
          * Group Actions
          */
-        $grid->addGroupAction('vygenerovat pozzvánku (PDF)')->onSelect[] = [$this, 'generateInvitationPDFs'];
+        $grid->addGroupAction('vygenerovat pozvánku (PDF)')->onSelect[] = [$this, 'generateInvitationPDFs'];
         $grid->addGroupAction('vygenerovat vstupenku (PDF)')->onSelect[] = [$this, 'generateTicketPDFs'];
 
         $grid->addGroupAction('odeslat pozvánku')->onSelect[] = (function ($ids){

@@ -1,26 +1,26 @@
 {block content}
-<div id="answerHeader">
-	<img src="{$basePath}/images/answer-header.png">
-</div>
-<div id="answerBox">
-	<h1 n:block=title>
-		{if ($customer->language == 'cz')}
-			Vánoční večírek 2018 - potvrzení účasti
+	<div id="answerHeader">
+		<img src="{$basePath}/images/answer-header.png">
+	</div>
+	<div id="answerBox">
+		<h1 n:block=title>
+			{if ($customer->language == 'cz')}
+				Vánoční večírek 2019 - potvrzení účasti
+			{else}
+				Christmas party 2019 - confirmation of participation
+			{/if}
+		</h1>
+		<p>
+			{if ($customer->language == 'cz')}
+				<strong>Jméno: </strong>{$customer->name}{if ($customer->company != '')}<br> <strong>Firma: </strong>{$customer->company}{/if}
+			{else}
+				<strong>Name: </strong>{$customer->name}<br> <strong>Company: </strong>{$customer->company}
+			{/if}
+		</p>
+		{if ($now > $deadline)}
+			<p>Přihlašování ukončeno</p>
 		{else}
-			Christmas party 2018 - confirmation of participation
+			{control invitationAnswer}
 		{/if}
-	</h1>
-	<p>
-		{if ($customer->language == 'cz')}
-			<strong>Jméno: </strong>{$customer->name}{if ($customer->company != '')}<br> <strong>Firma: </strong>{$customer->company}{/if}
-		{else}
-			<strong>Name: </strong>{$customer->name}<br> <strong>Company: </strong>{$customer->company}
-		{/if}
-	</p>
-	{if ($now > $deadline)}
-	<p>Přihlašování ukončeno</p>
-	{else}
-	{control invitationAnswer}
-	{/if}
-</div>
+	</div>
 {/block}

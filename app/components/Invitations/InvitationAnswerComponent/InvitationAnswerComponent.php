@@ -4,10 +4,11 @@ namespace App\Components;
 
 use app\entities\Customer;
 use DB\InvitationsRepository;
-use Ublaboo\DataGrid\DataGrid;
+use Nette\Application\AbortException;
+use Nette\Mail\SendException;
 use Nette\Application\UI\Form;
-
-
+use Tracy\Debugger;
+use Nette\Mail\Message;
 /**
  * Class InvitationAnswerComponent
  * @package App\Components
@@ -21,6 +22,13 @@ class InvitationAnswerComponent extends BaseGridComponent
      */
     protected $invitationsRepository;
     private $customerId;
+
+    /**
+     * @inject
+     * @var \Utils\Email\Email
+     */
+    public $mailer;
+    private $language;
 
     public function __construct(
         InvitationsRepository $invitationsRepository, $customerId
@@ -69,13 +77,55 @@ class InvitationAnswerComponent extends BaseGridComponent
         return $form;
     }
 
+    public function sendMailResponseSaved($id){
+
+        $customer = $this->invitationsRepository->findById($id);
+        //Debugger::log('ODESLÁNÍ INFORMACE O ZAZNAMENANÉ ODPOVĚDI5====================; ID ' . $customer->language);
+
+        $date = date("Y");
+
+        /* @var Customer $customer */
+        $mail = new Message;
+        $template = parent::createTemplate();
+        $template->customer = $customer;
+        if ($customer->language == 'cz'){
+            $subject = "Vánoční večírek $date – vaše odpověď byla zaznamenána";
+        }
+        else {
+            $subject = "Christmas party $date – your response has been saved";
+        }
+        $mail->setSubject($subject);
+        $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
+        $template->setFile(__MAIL_DIR__ . '/Generate/responseSaved_' . $customer->language . '.latte');
+        $mail->setHtmlBody($template);
+
+        try {
+            $mail->addTo($customer->email);
+            try {
+                $this->mailer->smtpMailer->send($mail);
+            } catch (SendException $e) {
+                Debugger::log($e, 'mailexception');
+            }
+            Debugger::log('OK    Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . 'proběhlo v pořádku; ID ');
+
+        } catch (\Exception $e) {
+            //$this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
+            Debugger::log('ERROR Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
+        }
+
+        try {
+            $this->presenter->redirect("this");
+        } catch (AbortException $e) {
+        }
+    }
+
     public function invitationAnswerSubmitted(Form $form)
     {
         $values = $form->getValues();
         $this->invitationsRepository->updateCustomer($this->customerId, $values->ticket_count, $values->note);
         $this->invitationsRepository->update($this->customerId, ["is_answered" => 1]);
         $this->invitationsRepository->update($this->customerId, ['answer_log' => new \DateTime()]);
-
+        $this->sendMailResponseSaved($this->customerId);
         $message = $this->customerId->language == 'cz'?'Uloženo':'Save';
         $this->getPresenter()->flashMessage($message, 'success');
     }
