@@ -4,11 +4,9 @@ namespace App\Components;
 
 use App\Presenters\HomepagePresenter;
 use Nette\Database\Table\Selection;
-use Nette\Forms\Form;
 use Nette\Mail\SendException;
 use Nette\Utils\DateTime;
 use Nette\Utils\Validators;
-use Tracy\OutputDebugger;
 use Ublaboo\DataGrid\DataGrid;
 use Nette\Mail\Message;
 use Nette\Utils\Random;
@@ -347,6 +345,8 @@ class InvitationsGridComponent extends BaseGridComponent
                     $this->mailer->smtpMailer->send($mail);
                 } catch (SendException $e) {
                     Debugger::log($e, 'mailexception');
+                    Debugger::log('ERROR 1 Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
+
                 }
 
                 if ($emailTemplate == 'invitation'){
@@ -360,7 +360,7 @@ class InvitationsGridComponent extends BaseGridComponent
                 $sentInvitationCount++;
             } catch (\Exception $e) {
                 $this->presenter->flashMessage("Mail zákazníkovi se nepodařilo odeslat. [$customer->id] [$customer->email] [$customer->name] [$customer->company]", 'error');
-                Debugger::log('ERROR Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
+                Debugger::log('ERROR 2 Odeslání mailu zákazníkovi [' . $customer->id . '] ' . $customer->email . ' se nezdařilo; ID ');
             }
 
         }
