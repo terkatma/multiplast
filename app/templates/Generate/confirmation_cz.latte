@@ -1,22 +1,30 @@
 <div style="max-width: 600px">
 <p>{if $customer->is_woman}Vážená paní{else}Vážený pane{/if} {$customer->addressing},</p>
 
-	<p>děkujeme za potvrzení účasti na Vánočním večírku společnosti TITAN-MULTIPLAST s.r.o., <br>
+	<p>děkujeme za potvrzení účasti na Vánočním večírku společnosti TITAN-MULTIPLAST s.r.o.,
 		Vaše elektronická registrace míst v divadle proběhla úspěšně.</p>
 
-	<p>Večírek se koná 8.12.2018 v Divadle BEZ ZÁBRADLÍ v Praze (Jungmannova 31, Praha 1).<br>
+	<p><strong>Rekapitulace:</strong></p>
+	<ul>
+		<li>Jméno: {$customer->name}</li>
+		<li>Firma: {$customer->company}</li>
+		<li>Počet povrzených vstupenek: {$customer->ticket_count}</li>
+		{if $customer->note != null}<li>Poznámka: {$customer->note}</li>{/if}
+	</ul>
+
+	<p>Večírek se koná 7. 12. 2019 v Divadle BEZ ZÁBRADLÍ v Praze (Jungmannova 31, Praha 1).<br>
 		Elektronické vstupenky a doplňující informace Vám zašleme e-mailem 7-10 dní před konáním akce. </p>
 
-<p><strong>Co vás čeká?</strong><br>
-	- 18:00-19:00	Welcome drink a malé občerstvení ve foayer divadla<br>
-	- 19:00-21:30	Situační komedie z pera úspěšného současného britského
-	dramatika Alana Ayckbourna o tom, že odpověď na otázku
-	"Kdes to byl(a) v noci?" může být za jistých okolností
-	v manželství jedna z nejtěžších<br>
-	- 21:30-02:00 	Raut při poslechu živé hudby ve foayer divadla</p><br>
+	<p><strong>Co vás čeká?</strong></p>
+	<ul>
+		<li>18:00-19:00	Welcome drink a malé občerstvení ve foyer divadla</li>
+		<li>19:00-21:30	<strong>S TVOJÍ DCEROU NE!</strong> Současná komedie plná krkolomných situací a trapasů
+			o tom, jak snadné je spadnout do manželské krize a jak těžko z ní ven.<br>
+			Hrají:  Petr Nárožný, Naďa Konvalinková, Martin Zahálka a další</li>
+		<li>21:30-02:00 	Raut při poslechu živé hudby ve foyer divadla</li>
+	</ul>
 
-
-	<p>Těšíme se na setkání s Vámi.</p>
+	<p>Těším se na setkání s Vámi.</p>
 
 	<div>Ing. Lukáš Horn<br>
 	<span id="ext-gen1540" style="box-sizing: border-box; font-weight: normal; font-size: 8pt; color: rgb(153, 153, 153);">jednatel společnosti / managing director</span><div>

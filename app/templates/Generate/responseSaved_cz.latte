@@ -1,7 +1,8 @@
 <div style="max-width: 600px">
 <p>{if $customer->is_woman}Vážená paní{else}Vážený pane{/if} {$customer->addressing},</p>
 
-	<p>děkujeme, Vaše elektronická odpověď byla zaznamenána.</p>
+	<p>děkujeme za Vaši odpověď. Velice nás mrzí, že se nemůžete zúčastnit Vánočního večírku společnosti TITAN-MULTIPLAST s.r.o..
+		Svou odpověď stále můžete změnit <a href="{$baseUrl}/invitation-answer/{$customer->hash}">zde</a>.</p>
 
 	<p><strong>Rekapitulace:</strong></p>
 	<ul>
@@ -10,8 +11,8 @@
 		<li>Počet povrzených vstupenek: {$customer->ticket_count}</li>
 		{if $customer->note != null}<li>Poznámka: {$customer->note}</li>{/if}
 	</ul>
-
-	<p>Svou odpověď můžete změnit <a href="{$baseUrl}/invitation-answer/{$customer->hash}">zde</a>.</p><br>
+<br>
+	<p>Přejeme příjemný zbytek roku 2019 a mnoho úspěchů v novém roce 2020.</p>
 
 	<div>S pozdravem,<br>Ing. Lukáš Horn<br>
 	<span id="ext-gen1540" style="box-sizing: border-box; font-weight: normal; font-size: 8pt; color: rgb(153, 153, 153);">jednatel společnosti / managing director</span><div>

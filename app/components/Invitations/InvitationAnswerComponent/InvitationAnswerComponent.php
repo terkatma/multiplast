@@ -77,30 +77,36 @@ class InvitationAnswerComponent extends BaseGridComponent
         return $form;
     }
 
-    public function sendMailResponseSaved($id){
+    public function sendMailResponseSaved($id)
+    {
 
+        /* @var Customer $customer */
         $customer = $this->invitationsRepository->findById($id);
-        //Debugger::log('ODESLÁNÍ INFORMACE O ZAZNAMENANÉ ODPOVĚDI5====================; ID ' . $customer->language);
+
+        Debugger::log('ODESLÁNÍ INFORMACE O ZAZNAMENANÉ ODPOVĚDI5====================; ID ' . $customer->language);
 
         $date = date("Y");
 
-        /* @var Customer $customer */
         $mail = new Message;
         $template = parent::createTemplate();
         $template->customer = $customer;
-        if ($customer->language == 'cz'){
-            $subject = "Vánoční večírek $date – vaše odpověď byla zaznamenána";
+        if ($customer->ticket_count != 0) {
+            $emailTemplate = 'confirmation';
+            $subject = $customer->language == 'cz'?"Vánoční večírek $date - potvrzení účasti":"Christmas party $date - confirmation of participation";
         }
         else {
-            $subject = "Christmas party $date – your response has been saved";
+            $emailTemplate = 'responseSaved';
+            $subject = $customer->language == 'cz'?"Vánoční večírek $date – vaše odpověď byla zaznamenána":"Christmas party $date – your response has been saved";
         }
+
         $mail->setSubject($subject);
         $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
-        $template->setFile(__MAIL_DIR__ . '/Generate/responseSaved_' . $customer->language . '.latte');
+
+        $template->setFile(__MAIL_DIR__ . '/Generate/'. $emailTemplate .'_' . $customer->language . '.latte');
         $mail->setHtmlBody($template);
 
         try {
-            $mail->addTo($customer->email);
+            $mail->addTo($customer["email"]);
             try {
                 $this->mailer->smtpMailer->send($mail);
             } catch (SendException $e) {
