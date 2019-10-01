@@ -40,7 +40,7 @@ class PDFExport
             $text = "             " . ($customer->is_woman ? "Dear Mrs" : "Dear Mr") . " " . $customer->addressing . ",";
             $pdf->Write(13.5, $text);
             $pdf->Ln(125.6);
-            $pdf->Write(13.5, "                                                          $date");
+            $pdf->Write(13.5, "                                                                      $date");
         }
 
         if (!is_dir(__INVITATIONS_DIR__ . "/" . $year . "/")) {
