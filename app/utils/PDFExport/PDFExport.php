@@ -66,8 +66,13 @@ class PDFExport
 
         $ticket_count = $customer->ticket_count;
         $pdf->Ln(46.5);
-        $pdf->Write(13.5,"                                                                                                                        $ticket_count");
+        if ($customer->language == 'cz') {
+            $pdf->Write(13.5, "                                                                                                                        $ticket_count");
+        }
+        else {
+            $pdf->Write(13.5, "                                                                                                                                $ticket_count");
 
+        }
         $pdf->Ln(30.7);
 
         // set style for barcode
