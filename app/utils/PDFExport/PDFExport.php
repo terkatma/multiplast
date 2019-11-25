@@ -54,13 +54,19 @@ class PDFExport
     {
         $year = date("Y");
         /* @var Customer $customer */
+
         $pdf = $this->initPdf("", "P", false);
+        $pdf->SetFont("DeJaVuSans",'', 8, true);
         $pdf->AddPage();
-        $tmp = __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg";
+        $tmp = __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . ".jpg";
         $pdf->Image(
-            __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . "_" . $customer->ticket_count . ".jpg",
+            __TICKET_BACKGROUNDS_DIR__ . $year . "/" . $customer->language . ".jpg",
             0,
             0, 210, 297, 'JPG', '', '', false, 300, '', false, false, 0);
+
+        $ticket_count = $customer->ticket_count;
+        $pdf->Ln(46.5);
+        $pdf->Write(13.5,"                                                                                                                        $ticket_count");
 
         $pdf->Ln(30.7);
 
@@ -75,7 +81,7 @@ class PDFExport
             'module_height' => 1 // height of a single module in points
         );
 
-        $pdf->write2DBarcode($customer->hash, 'QRCODE,L', 146, 27, 43, 43, $style, 'N');
+        $pdf->write2DBarcode($customer->hash, 'QRCODE,L', 138.5, 39.5, 43, 43, $style, 'N');
 
         if (!is_dir(__TICKETS_DIR__ . "/" . $year . "/")) {
             mkdir(__TICKETS_DIR__ . "/" . $year . "/", 0777, true);

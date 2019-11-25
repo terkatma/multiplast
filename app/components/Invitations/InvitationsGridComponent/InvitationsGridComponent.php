@@ -326,14 +326,22 @@ class InvitationsGridComponent extends BaseGridComponent
             if ($customer->language == 'cz'){
                 $subject = "Vánoční večírek $date";
                 $attachement = 'pozvánka';
+                $attachementName = "Vánoční večírek $date";
             }
             else {
                 $subject = "Christmas party $date";
                 $attachement = 'invitation';
+                $attachementName = "Christmas party $date";
             }
+            if ($emailTemplate == 'reminder' && $customer->language == 'cz'){
+                $subject = "UPOMÍNKA potvrzení účasti – Vánoční večírek $date";
+                $attachement = 'pozvánka';
+            }
+            //todo en reminder
+
             $mail->setSubject($subject);
             $mail->setFrom('monika.drobna86@gmail.com', 'Ing. Lukáš Horn');
-            $mail->addAttachment("$subject - $attachement.pdf", file_get_contents(__INVITATIONS_DIR__."/" . $date . "/" . $customer->id . ".pdf"));
+            $mail->addAttachment("$attachementName - $attachement.pdf", file_get_contents(__INVITATIONS_DIR__."/" . $date . "/" . $customer->id . ".pdf"));
             $template->setFile(__MAIL_DIR__ . '/Generate/' . $emailTemplate . '_' . $customer->language . '.latte');
             $mail->setHtmlBody($template);
 
